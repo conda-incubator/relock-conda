@@ -14,9 +14,10 @@ jobs:
     name: tests
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: ./
+      - name: relock
+        uses: ./
         with:
           environment-file: test-env.yml
           lock-file: conda-lock.yml
