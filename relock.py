@@ -129,9 +129,7 @@ def main(environment_file, lock_file, ignored_packages, relock_all_packages):
                     for platform in envyml["platforms"]:
                         print(f"  platform: {platform}", flush=True)
                         for pkg, old_ver, new_ver in relock_tuples[platform]:
-                            print(
-                                f"    - {pkg}: {old_ver} -> {new_ver}", flush=True
-                            )
+                            print(f"    - {pkg}: {old_ver} -> {new_ver}", flush=True)
                         print("", flush=True)
 
                     relocked = True
