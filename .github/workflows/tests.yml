@@ -27,7 +27,7 @@ jobs:
           lock-file: conda-lock.yml
           ignored-packages: ''
           relock-all-packages: false
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_PAT }}
           automerge: false
           base-branch: ${{ github.head_ref }}
 
