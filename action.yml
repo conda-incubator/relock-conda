@@ -82,7 +82,7 @@ runs:
         delete-branch: true
         token: ${{ inputs.github-token }}
         labels: dependencies
-        base: ${{ inputs.base }}
+        base: ${{ inputs.base-branch }}
 
     - name: automerge
       if: steps.pr.outputs.pull-request-number != '' && inputs.automerge == 'true'
