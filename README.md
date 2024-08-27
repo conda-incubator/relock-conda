@@ -1,4 +1,6 @@
 # relock-conda
+[![tests](https://github.com/beckermr/relock-conda/actions/workflows/tests.yml/badge.svg)](https://github.com/beckermr/relock-conda/actions/workflows/tests.yml)
+
 GitHub action to relock conda environments using conda-lock
 
 ## Usage
