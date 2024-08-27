@@ -14,6 +14,7 @@ jobs:
   tests:
     name: tests
     runs-on: "ubuntu-latest"
+    if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
       - uses: actions/checkout@v4
 
@@ -29,7 +30,12 @@ jobs:
           automerge: false
           base-branch: ${{ github.head_ref }}
 
+      - name: did it relock?
+        if: steps.relock.outputs.relocked != 'true'
+        run: exit 1
+
       - name: test that PR is OK
+        if: steps.relock.outputs.relocked == 'true'
         shell: bash
         run: |
           gh pr checkout ${{ steps.relock.outputs.pull-request-number }}
@@ -42,6 +48,7 @@ jobs:
           fi
           grep numpy conda-lock.yml
           grep python conda-lock.yml
+          grep blah conda-lock.yml
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
 
