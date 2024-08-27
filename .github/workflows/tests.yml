@@ -1,0 +1,33 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: null
+
+jobs:
+  tests:
+    name: tests
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      - uses: mamba-org/setup-micromamba@f8b8a1e23a26f60a44c853292711bacfd3eac822 # v1
+        with:
+          environment-name: relock-env
+          create-args: >-
+            python
+            click
+            ruamel.yaml
+            conda
+            conda-lock
+            ruff
+          condarc: |
+            channels:
+                - conda-forge
+
+      - name: lint
+        shell: bash -leo pipefail {0}
+        run: |
+          ruff check relock.py
