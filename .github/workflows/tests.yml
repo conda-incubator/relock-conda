@@ -27,7 +27,8 @@ jobs:
             channels:
                 - conda-forge
 
-      - name: lint
+      - name: lint & format
         shell: bash -leo pipefail {0}
         run: |
           ruff check relock.py
+          ruff format --check relock.py
