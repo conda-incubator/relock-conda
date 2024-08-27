@@ -67,6 +67,7 @@ runs:
           echo EOF
         } >> "$GITHUB_OUTPUT"
         rm ${{ github.action_path }}/summary.txt
+        ls -lah
 
     - name: open PR
       id: pr
