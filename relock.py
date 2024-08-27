@@ -75,7 +75,7 @@ def main(environment_file, lock_file, ignored_packages, relock_all_packages):
                     flush=True,
                 )
             else:
-                with open("environment.yml") as f:
+                with open(environment_file) as f:
                     envyml = yaml.load(f)
 
                 with open(backup_lock_file) as f:
@@ -137,7 +137,7 @@ def main(environment_file, lock_file, ignored_packages, relock_all_packages):
                     shutil.move(backup_lock_file, lock_file)
         except Exception as e:
             if os.path.exists(backup_lock_file) and have_existing_lock_file:
-                shutil.move(shutil.move(backup_lock_file, lock_file))
+                shutil.move(backup_lock_file, lock_file)
             raise e
 
 
