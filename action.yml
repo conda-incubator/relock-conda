@@ -62,7 +62,7 @@ runs:
           --relock-all-packages=${{ inputs.relock-all-packages }} \
           > ${{ github.action_path }}/summary.txt
         {
-          echo 'SUMMARY<<EOF'
+          echo 'summary<<EOF'
           cat ${{ github.action_path }}/summary.txt
           echo EOF
         } >> "$GITHUB_OUTPUT"
@@ -70,6 +70,7 @@ runs:
 
     - name: open PR
       id: pr
+      if: steps.relock.outputs.relocked == 'true'
       uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
       with:
         commit-message: relock w/ conda-lock
@@ -77,7 +78,7 @@ runs:
         body: "This pull request relocks the dependencies with conda-lock.
 
 
-          ${{ steps.relock.outputs.SUMMARY }}"
+          ${{ steps.relock.outputs.summary }}"
         branch: relock-conda
         delete-branch: true
         token: ${{ inputs.github-token }}
@@ -85,7 +86,7 @@ runs:
         base: ${{ inputs.base-branch }}
 
     - name: automerge
-      if: steps.pr.outputs.pull-request-number != '' && inputs.automerge == 'true'
+      if: inputs.automerge == 'true' && steps.relock.outputs.relocked == 'true' && steps.pr.outputs.pull-request-number != ''
       shell: bash -leo pipefail {0}
       run: gh pr merge --merge --auto "${{ steps.pr.outputs.pull-request-number }}"
       env:

@@ -45,13 +45,14 @@ def _reformat_lockfile(lockfile):
 @click.option("--ignored-packages", required=True, type=str)
 @click.option("--relock-all-packages", required=True, type=str)
 def main(environment_file, lock_file, ignored_packages, relock_all_packages):
-    ignored_packages = [pkg.strip() for pkg in ignored_packages.split(",")]
-    relock_all_packages = relock_all_packages.lower() == "true"
-
-    have_existing_lock_file = os.path.exists(lock_file)
-
+    relocked = False
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
+            ignored_packages = [pkg.strip() for pkg in ignored_packages.split(",")]
+            relock_all_packages = relock_all_packages.lower() == "true"
+
+            have_existing_lock_file = os.path.exists(lock_file)
+
             backup_lock_file = os.path.join(tmpdir, os.path.basename(lock_file))
             if have_existing_lock_file:
                 shutil.move(lock_file, backup_lock_file)
@@ -74,6 +75,7 @@ def main(environment_file, lock_file, ignored_packages, relock_all_packages):
                     "A lock file has been created in this PR since no existing one was found.",
                     flush=True,
                 )
+                relocked = True
             else:
                 with open(environment_file) as f:
                     envyml = yaml.load(f)
@@ -123,22 +125,35 @@ def main(environment_file, lock_file, ignored_packages, relock_all_packages):
                 if any(relock_tuples[platform] for platform in envyml["platforms"]):
                     _reformat_lockfile(lock_file)
 
-                    if any(relock_tuples[platform] for platform in envyml["platforms"]):
-                        print("The following packages have been updated:\n", flush=True)
-                        for platform in envyml["platforms"]:
-                            print(f"  platform: {platform}", flush=True)
-                            for pkg, old_ver, new_ver in relock_tuples[platform]:
-                                print(
-                                    f"    - {pkg}: {old_ver} -> {new_ver}", flush=True
-                                )
-                            print("", flush=True)
+                    print("The following packages have been updated:\n", flush=True)
+                    for platform in envyml["platforms"]:
+                        print(f"  platform: {platform}", flush=True)
+                        for pkg, old_ver, new_ver in relock_tuples[platform]:
+                            print(
+                                f"    - {pkg}: {old_ver} -> {new_ver}", flush=True
+                            )
+                        print("", flush=True)
+
+                    relocked = True
                 else:
                     print("No packages have been updated.", flush=True, file=sys.stderr)
                     shutil.move(backup_lock_file, lock_file)
+                    relocked = False
         except Exception as e:
             if os.path.exists(backup_lock_file) and have_existing_lock_file:
                 shutil.move(backup_lock_file, lock_file)
+
+            subprocess.run(
+                'echo "relocked=false" >> "$GITHUB_OUTPUT"',
+                shell=True,
+            )
+
             raise e
+
+    subprocess.run(
+        f'echo "relocked={"true" if relocked else "false"}" >> "$GITHUB_OUTPUT"',
+        shell=True,
+    )
 
 
 if __name__ == "__main__":
