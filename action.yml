@@ -29,6 +29,11 @@ inputs:
     description: 'whether to automatically merge the PR'
     required: true
     default: false
+  base-branch:
+    description: >
+      the base branch for PRs (See
+      [this documentation](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#events-which-checkout-a-commit)
+      for more details.)
 
 runs:
   using: "composite"
@@ -77,6 +82,7 @@ runs:
         delete-branch: true
         token: ${{ inputs.github-token }}
         labels: dependencies
+        base-branch: ${{ inputs.base }}
 
     - name: automerge
       if: steps.pr.outputs.pull-request-number != '' && inputs.automerge == 'true'
