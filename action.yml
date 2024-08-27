@@ -34,6 +34,7 @@ inputs:
       the base branch for PRs (See
       [this documentation](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#events-which-checkout-a-commit)
       for more details.)
+
 outputs:
   pull-request-number:
     description: "the number of the PR that was opened"
