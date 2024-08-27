@@ -25,7 +25,7 @@ jobs:
           relock-all-packages: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
           automerge: false
-          base-branche: ${{ github.head_ref }}
+          base-branch: ${{ github.head_ref }}
 
       - name:
         shell: bash
