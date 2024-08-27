@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   tests-lock:
-    name: tests lock
+    name: test updates
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
@@ -60,7 +60,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_PAT }}
 
   tests-no-lock:
-    name: tests lock
+    name: test no update
+    needs: tests-lock
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
