@@ -67,23 +67,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: mamba-org/setup-micromamba@f8b8a1e23a26f60a44c853292711bacfd3eac822 # v1
+      - uses: conda-incubator/setup-miniconda@v3
         with:
-          environment-name: relock-env
-          create-args: >-
-            python
-            click
-            ruamel.yaml
-            conda
-            conda-lock
-          condarc: |
-            channels:
-              - conda-forge
+          python-version: 3.11
+          channels: conda-forge
+          channel-priority: strict
+          show-channel-urls: true
+          miniforge-version: latest
 
       - name: make the lock file
         shell: bash -leo pipefail {0}
         run: |
-          conda lock --file test-env.yml --lockfile conda-lockk.yml
+          conda install --yes conda-lock
+          conda-lock lock --file test-env.yml --lockfile conda-lockk.yml
 
       - name: relock
         id: relock
