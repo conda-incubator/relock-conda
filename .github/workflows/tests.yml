@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  tests:
-    name: tests
+  tests-lock:
+    name: tests lock
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
@@ -51,23 +51,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
 
-      - name: relock again
-        id: relock_again
-        uses: ./
-        with:
-          environment-file: test-env.yml
-          lock-file: conda-lock.yml
-          ignored-packages: ''
-          relock-all-packages: false
-          github-token: ${{ secrets.GH_PAT }}
-          automerge: false
-          base-branch: ${{ github.head_ref }}
-
-      - name: did it not relock?
-        if: steps.relock_again.outputs.relocked == 'true'
-        run: exit 1
-
-      - name: close PR 1
+      - name: close PR
         if: always()
         continue-on-error: true
         shell: bash
@@ -75,10 +59,51 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
 
-      - name: close PR 2
+  tests-no-lock:
+    name: tests lock
+    runs-on: "ubuntu-latest"
+    if: github.event.pull_request.title != 'relock w/ conda-lock'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: mamba-org/setup-micromamba@f8b8a1e23a26f60a44c853292711bacfd3eac822 # v1
+        with:
+          environment-name: relock-env
+          create-args: >-
+            python
+            click
+            ruamel.yaml
+            conda
+            conda-lock
+          condarc: |
+            channels:
+              - conda-forge
+
+      - name: make the lock file
+        shell: bash -leo pipefail {0}
+        run: |
+          conda lock --file test-env.yml --lockfile conda-lockk.yml
+
+      - name: relock
+        id: relock
+        uses: ./
+        with:
+          environment-file: test-env.yml
+          lock-file: conda-lockk.yml
+          ignored-packages: ''
+          relock-all-packages: false
+          github-token: ${{ secrets.GH_PAT }}
+          automerge: false
+          base-branch: ${{ github.head_ref }}
+
+      - name: did it not relock?
+        if: steps.relock.outputs.relocked == 'true'
+        run: exit 1
+
+      - name: close PR
         if: always()
         continue-on-error: true
         shell: bash
-        run: gh pr close ${{ steps.relock_again.outputs.pull-request-number }}
+        run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}

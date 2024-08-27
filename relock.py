@@ -65,7 +65,7 @@ def main(environment_file, lock_file, ignored_packages, relock_all_packages):
 
             print("Relocking environment.yml...", flush=True, file=sys.stderr)
             subprocess.run(
-                ["conda", "lock", "--file", environment_file],
+                ["conda", "lock", "--file", environment_file, "--lockfile", lock_file],
                 check=True,
                 capture_output=True,
             )
