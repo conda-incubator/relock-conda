@@ -3,6 +3,10 @@
 
 GitHub action to relock conda environments using conda-lock
 
+This action runs [conda-lock](https://github.com/conda/conda-lock) to relock a conda environment and makes a PR
+with the changes if any are found. By default, a PR is only made if a package list in the input `environment.yml`
+file is updated.
+
 ## Usage
 
 ```yaml
