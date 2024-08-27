@@ -1,0 +1,102 @@
+name: 'relock-conda'
+description: 'GitHub action to relock conda environments using conda-lock'
+author: Matthew R. Becker and the regro-cf-autotick-bot team
+branding:
+  icon: 'rotate-cw'
+  color: 'green'
+
+inputs:
+  environment-file:
+    description: 'the environment to (re)lock'
+    required: false
+    default: environment.yml
+  lock-file:
+    description: 'the lock file to update'
+    required: true
+    default: 'conda-lock.yml'
+  ignored-packages:
+    description: 'comma-separated list of packages whose version changes are ignored when relocking'
+    required: true
+    default: ''
+  relock-all-packages:
+    description: 'whether to relock on an update to any package in the environment, not just those in the environment file'
+    required: true
+    default: false
+  github-token:
+    description: 'GitHub personal access token to use for making PRs'
+    required: true
+  automerge:
+    description: 'whether to automatically merge the PR'
+    required: true
+    default: false
+  base-branch:
+    description: >
+      the base branch for PRs (See
+      [this documentation](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#events-which-checkout-a-commit)
+      for more details.)
+
+outputs:
+  pull-request-number:
+    description: "the number of the PR that was opened"
+    value: ${{ steps.pr.outputs.pull-request-number }}
+  relocked:
+    description: "whether the environment was relocked"
+    value: ${{ steps.relock.outputs.relocked }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: mamba-org/setup-micromamba@f8b8a1e23a26f60a44c853292711bacfd3eac822 # v1
+      with:
+        environment-name: relock-env
+        create-args: >-
+          python
+          click
+          ruamel.yaml
+          conda
+          conda-lock
+        condarc: |
+          channels:
+            - conda-forge
+
+    - name: relock
+      shell: bash -leo pipefail {0}
+      id: relock
+      run: |
+        python ${{ github.action_path }}/relock.py \
+          --environment-file=${{ inputs.environment-file }} \
+          --lock-file=${{ inputs.lock-file }} \
+          --ignored-packages=${{ inputs.ignored-packages }} \
+          --relock-all-packages=${{ inputs.relock-all-packages }} \
+          > ${{ github.action_path }}/summary.txt
+        {
+          echo 'summary<<EOF'
+          cat ${{ github.action_path }}/summary.txt
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+        rm ${{ github.action_path }}/summary.txt
+        ls -lah
+
+    - name: open PR
+      id: pr
+      if: steps.relock.outputs.relocked == 'true'
+      uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
+      with:
+        commit-message: relock w/ conda-lock
+        title: relock w/ conda-lock
+        body: "This pull request relocks the dependencies with conda-lock.
+
+
+          ${{ steps.relock.outputs.summary }}"
+        branch: relock-conda
+        delete-branch: true
+        token: ${{ inputs.github-token }}
+        labels: dependencies
+        base: ${{ inputs.base-branch }}
+
+    - name: automerge
+      if: inputs.automerge == 'true' && steps.relock.outputs.relocked == 'true' && steps.pr.outputs.pull-request-number != ''
+      shell: bash -leo pipefail {0}
+      run: gh pr merge --merge --auto "${{ steps.pr.outputs.pull-request-number }}"
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
