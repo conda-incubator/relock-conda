@@ -18,6 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: relock
+        id: relock
         uses: ./
         with:
           environment-file: test-env.yml
@@ -28,9 +29,10 @@ jobs:
           automerge: false
           base-branch: ${{ github.head_ref }}
 
-      - name:
+      - name: test that PR is OK
         shell: bash
         run: |
+          gh pr checkout ${{ steps.relock.outputs.pull-request-number }}
           ls -lah
           if [ -f conda-lock.yml ]; then
             :  # do nothing
@@ -40,3 +42,13 @@ jobs:
           fi
           grep numpy conda-lock.yml
           grep python conda-lock.yml
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+
+      - name: close PR
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
