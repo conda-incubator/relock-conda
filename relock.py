@@ -69,7 +69,7 @@ def main(environment_file, lock_file, ignored_packages, relock_all_packages):
                 capture_output=True,
             )
 
-            if not have_existing_lock_file:
+            if not  have_existing_lock_file:
                 print(
                     "A lock file has been created in this PR since no existing one was found.",
                     flush=True,
