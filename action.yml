@@ -66,10 +66,10 @@ runs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
         fi
       env:
-        GH_TOKEN: ${{ secrets.AUTOTICK_BOT_TOKEN }}
+        GH_TOKEN: ${{ inputs.github-token }}
         SKIP_IF_PR_EXISTS: ${{ inputs.skip-if-pr-exists }}
 
-    - setup conda-lock
+    - name: setup conda-lock
       if: ${{ steps.check.outputs.skip != 'true' }}
       uses: mamba-org/setup-micromamba@f8b8a1e23a26f60a44c853292711bacfd3eac822 # v1
       with:
