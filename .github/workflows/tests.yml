@@ -106,7 +106,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_PAT }}
 
   tests-skip-existing-part-1:
-    name: test updates
+    name: test skip existing part 1
     needs: tests-no-lock
     outputs:
       pull-request-number: ${{ steps.relock.outputs.pull-request-number }}
@@ -148,7 +148,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_PAT }}
 
   tests-skip-existing-part-2:
-    name: test updates
+    name: test skip existing part 2
     needs: tests-skip-existing-part-1
     runs-on: "ubuntu-latest"
     steps:
