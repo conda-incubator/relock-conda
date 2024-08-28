@@ -59,7 +59,7 @@ runs:
             --repo "$GITHUB_REPOSITORY" \
             --head 'relock-conda' \
             --json title \
-            --jq 'map(select(. == "relock w/ conda-lock")) | length')
+            --jq 'map(select(.title == "relock w/ conda-lock")) | length')
         if [[ ${prs} !=  "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
         else
