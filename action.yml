@@ -57,10 +57,9 @@ runs:
       run: |
         prs=$(gh pr list \
             --repo "$GITHUB_REPOSITORY" \
-            --head 'relock-deps' \
-            --base 'master' \
+            --head 'relock-conda' \
             --json title \
-            --jq 'length')
+            --jq 'map(select(. == "relock w/ conda-lock")) | length')
         if [[ ${prs} !=  "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
         else
