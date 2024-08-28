@@ -32,11 +32,20 @@ jobs:
           # optional list of packages whose changes are ignore when relocking
           # ignored-packages: "numpy,scipy"
 
-          # whether to relock on an update to any package in the environment, not just those in the environment file
+          # whether to relock on an update to any package in the environment,
+          # not just those in the environment file
           # relock-all-packages: false  # default
 
-          # automerge the PR - you need to have GitHub automerge enabled to use this
+          # automerge the PR - you need to have GitHub automerge enabled
           # automerge: false  # default
+
+          # use this setting to fix issues with the base branch not
+          # being inferred correctly
+          # See https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#events-which-checkout-a-commit
+          # base-branch: blah
+
+          # whether to skip relocking if a PR already exists
+          # skip-if-pr-exists: false  # default
 ```
 
 See the [action.yml](action.yml) for details on possible inputs and options.

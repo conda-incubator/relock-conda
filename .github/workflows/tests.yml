@@ -104,3 +104,78 @@ jobs:
         run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
+
+  tests-skip-existing-part-1:
+    name: test updates
+    needs: tests-no-lock
+    outputs:
+      pull-request-number: ${{ steps.relock.outputs.pull-request-number }}
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: relock
+        id: relock
+        uses: ./
+        with:
+          environment-file: test-env.yml
+          lock-file: conda-lock.yml
+          ignored-packages: ''
+          relock-all-packages: false
+          github-token: ${{ secrets.GH_PAT }}
+          automerge: false
+          base-branch: ${{ github.head_ref }}
+
+      - name: did it relock?
+        if: steps.relock.outputs.relocked != 'true'
+        run: exit 1
+
+      - name: test that PR is OK
+        if: steps.relock.outputs.relocked == 'true'
+        shell: bash
+        run: |
+          gh pr checkout ${{ steps.relock.outputs.pull-request-number }}
+          ls -lah
+          if [ -f conda-lock.yml ]; then
+            :  # do nothing
+          else
+            echo "conda-lock.yml not found"
+            exit 1
+          fi
+          grep numpy conda-lock.yml
+          grep python conda-lock.yml
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+
+  tests-skip-existing-part-2:
+    name: test updates
+    needs: tests-skip-existing-part-1
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: relock
+        id: relock
+        uses: ./
+        with:
+          environment-file: test-env.yml
+          lock-file: conda-lock.yml
+          ignored-packages: ''
+          relock-all-packages: false
+          github-token: ${{ secrets.GH_PAT }}
+          automerge: false
+          base-branch: ${{ github.head_ref }}
+          skip-if-pr-exists: true
+
+      - name: did it relock?
+        if: steps.relock.outputs.relocked == 'true'
+        run: exit 1
+
+      - name: close PR
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: gh pr close ${{ needs.tests-skip-existing-part-1.outputs.pull-request-number }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+
