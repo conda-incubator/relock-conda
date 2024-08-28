@@ -53,6 +53,7 @@ runs:
     # https://stackoverflow.com/a/73828715/1745538
     - name: skip if PR already exists
       id: check
+      shell: bash -leo pipefail {0}
       run: |
         prs=$(gh pr list \
             --repo "$GITHUB_REPOSITORY" \
