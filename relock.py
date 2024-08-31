@@ -44,7 +44,8 @@ def _reformat_lockfile(lockfile):
 @click.option("--lock-file", required=True, type=click.Path())
 @click.option("--ignored-packages", required=True, type=str)
 @click.option("--relock-all-packages", required=True, type=str)
-def main(environment_file, lock_file, ignored_packages, relock_all_packages):
+@click.option("--include-only-packages", required=True, type=str)
+def main(environment_file, lock_file, ignored_packages, relock_all_packages, include_only_packages):
     relocked = False
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
@@ -101,6 +102,8 @@ def main(environment_file, lock_file, ignored_packages, relock_all_packages):
                     for platform in envyml["platforms"]:
                         for pkg in new_platform_pkg_to_ver[platform]:
                             deps_to_relock.add(pkg)
+                elif include_only_packages:
+                    deps_to_relock = set(include_only_packages.split(","))
                 else:
                     deps_to_relock = set()
                     for _spec in envyml["dependencies"]:

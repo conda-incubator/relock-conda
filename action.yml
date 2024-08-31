@@ -18,6 +18,12 @@ inputs:
     description: 'comma-separated list of packages whose version changes are ignored when relocking'
     required: true
     default: ''
+  include-only-packages:
+    description: >
+      comma-separated list of packages to exclusively include when relocking, all others will be ignored,
+      ignored-packages is applied to this list
+    required: true
+    default: ''
   relock-all-packages:
     description: 'whether to relock on an update to any package in the environment, not just those in the environment file'
     required: true
@@ -94,6 +100,7 @@ runs:
           --lock-file=${{ inputs.lock-file }} \
           --ignored-packages=${{ inputs.ignored-packages }} \
           --relock-all-packages=${{ inputs.relock-all-packages }} \
+          --include-only-packages=${{ inputs.include-only-packages }} \
           > ${{ github.action_path }}/summary.txt
         {
           echo 'summary<<EOF'
