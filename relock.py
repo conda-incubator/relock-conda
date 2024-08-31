@@ -13,6 +13,16 @@ yaml.indent(mapping=2, sequence=4, offset=2)
 yaml.default_flow_style = False
 
 
+def _split_package_list(package_list):
+    packages = []
+    for line in package_list.split("\n"):
+        for pkg in line.split(","):
+            _pkg = pkg.strip()
+            if _pkg:
+                packages.append(_pkg)
+    return packages
+
+
 def _lock_to_ver(lock, platform):
     pkg_to_ver = {}
     for pkg in lock["package"]:
@@ -55,7 +65,7 @@ def main(
     relocked = False
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
-            ignored_packages = [pkg.strip() for pkg in ignored_packages.split(",")]
+            ignored_packages = _split_package_list(ignored_packages)
             relock_all_packages = relock_all_packages.lower() == "true"
 
             have_existing_lock_file = os.path.exists(lock_file)
@@ -109,7 +119,7 @@ def main(
                         for pkg in new_platform_pkg_to_ver[platform]:
                             deps_to_relock.add(pkg)
                 elif include_only_packages:
-                    deps_to_relock = set(include_only_packages.split(","))
+                    deps_to_relock = set(_split_package_list(include_only_packages))
                 else:
                     deps_to_relock = set()
                     for _spec in envyml["dependencies"]:
