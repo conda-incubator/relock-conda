@@ -45,7 +45,13 @@ def _reformat_lockfile(lockfile):
 @click.option("--ignored-packages", required=True, type=str)
 @click.option("--relock-all-packages", required=True, type=str)
 @click.option("--include-only-packages", required=True, type=str)
-def main(environment_file, lock_file, ignored_packages, relock_all_packages, include_only_packages):
+def main(
+    environment_file,
+    lock_file,
+    ignored_packages,
+    relock_all_packages,
+    include_only_packages,
+):
     relocked = False
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
