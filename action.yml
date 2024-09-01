@@ -140,6 +140,7 @@ runs:
     - name: set output
       id: set-output
       if: always()
+      shell: bash -leo pipefail {0}
       run: |
         if [[ '${{ steps.check.outputs.skip }}' == 'true' ]]; then
           echo "relocked=false" >> "$GITHUB_OUTPUT"
