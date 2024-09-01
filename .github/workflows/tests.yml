@@ -232,8 +232,8 @@ jobs:
           base-branch: ${{ github.head_ref }}
           head-branch: tests-ignore
           ignored-packages: |
-            - python
-            - numpy
+            python
+            numpy
 
       - name: did it not relock?
         if: steps.relock.outputs.relocked == 'true'
