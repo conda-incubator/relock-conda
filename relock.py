@@ -132,19 +132,29 @@ def main(
                             for _pkg in _spec:
                                 deps_to_relock.add(MatchSpec(_pkg).name)
 
-                print("relock all packages:", relock_all_packages, flush=True)
+                print(
+                    "relock all packages:",
+                    relock_all_packages,
+                    flush=True,
+                    file=sys.stderr,
+                )
                 print(
                     "initial deps to relock:\n",
                     pprint.pformat(deps_to_relock),
                     flush=True,
+                    file=sys.stderr,
                 )
                 print(
-                    "ignored packages:\n", pprint.pformat(ignored_packages), flush=True
+                    "ignored packages:\n",
+                    pprint.pformat(ignored_packages),
+                    flush=True,
+                    file=sys.stderr,
                 )
                 print(
                     "include only packages:\n",
                     pprint.pformat(include_only_packages),
                     flush=True,
+                    file=sys.stderr,
                 )
 
                 deps_to_relock = deps_to_relock - set(ignored_packages)
@@ -153,6 +163,7 @@ def main(
                     "final deps to relock:\n",
                     pprint.pformat(deps_to_relock),
                     flush=True,
+                    file=sys.stderr,
                 )
 
                 relock_tuples = {platform: [] for platform in envyml["platforms"]}
