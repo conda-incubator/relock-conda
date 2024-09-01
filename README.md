@@ -32,6 +32,9 @@ jobs:
           # optional list of packages whose changes are ignore when relocking
           # ignored-packages: "numpy,scipy"
 
+          # use only these packages to determine if a relock is needed
+          # include-only-packages: "numpy,scipy"
+
           # whether to relock on an update to any package in the environment,
           # not just those in the environment file
           # relock-all-packages: false  # default
@@ -43,6 +46,9 @@ jobs:
           # being inferred correctly
           # See https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#events-which-checkout-a-commit
           # base-branch: blah
+
+          # the head branch for PRs
+          # head-branch: relock-conda  # default
 
           # whether to skip relocking if a PR already exists
           # skip-if-pr-exists: false  # default

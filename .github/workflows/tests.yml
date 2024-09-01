@@ -59,6 +59,7 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
           automerge: false
           base-branch: ${{ github.head_ref }}
+          head-branch: tests-lock
 
       - name: did it relock?
         if: steps.relock.outputs.relocked != 'true'
@@ -91,7 +92,6 @@ jobs:
 
   tests-no-lock:
     name: test no update
-    needs: tests-lock
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
@@ -122,6 +122,7 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
           automerge: false
           base-branch: ${{ github.head_ref }}
+          head-branch: tests-no-lock
 
       - name: did it not relock?
         if: steps.relock.outputs.relocked == 'true'
@@ -137,7 +138,6 @@ jobs:
 
   tests-skip-existing-part-1:
     name: test skip existing part 1
-    needs: tests-no-lock
     outputs:
       pull-request-number: ${{ steps.relock.outputs.pull-request-number }}
     runs-on: "ubuntu-latest"
@@ -156,6 +156,7 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
           automerge: false
           base-branch: ${{ github.head_ref }}
+          head-branch: tests-skip-existing
 
       - name: did it relock?
         if: steps.relock.outputs.relocked != 'true'
@@ -197,6 +198,7 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
           automerge: false
           base-branch: ${{ github.head_ref }}
+          head-branch: tests-skip-existing
           skip-if-pr-exists: true
 
       - name: did it relock?
@@ -213,7 +215,6 @@ jobs:
 
   tests-ignore:
     name: test ignore
-    needs: tests-skip-existing-part-2
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
@@ -232,6 +233,7 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
           automerge: false
           base-branch: ${{ github.head_ref }}
+          head-branch: tests-ignore
 
       - name: did it not relock?
         if: steps.relock.outputs.relocked == 'true'

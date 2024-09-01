@@ -40,6 +40,10 @@ inputs:
       the base branch for PRs (See
       [this documentation](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#events-which-checkout-a-commit)
       for more details.)
+  head-branch:
+    description: 'the head branch for PRs'
+    required: true
+    default: 'relock-conda'
   skip-if-pr-exists:
     description: 'whether to skip relocking if a PR already exists'
     required: true
@@ -120,7 +124,7 @@ runs:
 
 
           ${{ steps.relock.outputs.summary }}"
-        branch: relock-conda
+        branch: ${{ inputs.head-branch }}
         delete-branch: true
         token: ${{ inputs.github-token }}
         labels: dependencies
