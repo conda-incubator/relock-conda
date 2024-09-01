@@ -1,5 +1,6 @@
 from collections.abc import Mapping
 import os
+import pprint
 import shutil
 import subprocess
 import sys
@@ -16,11 +17,12 @@ yaml.default_flow_style = False
 
 def _split_package_list(package_list):
     packages = []
-    for line in package_list.split("\n"):
-        for pkg in line.split(","):
-            _pkg = pkg.strip()
-            if _pkg:
-                packages.append(_pkg)
+    for nline in package_list.split("\n"):
+        for cline in nline.split(","):
+            for sline in cline.split():
+                _pkg = sline.strip()
+                if _pkg:
+                    packages.append(_pkg)
     return packages
 
 
@@ -130,7 +132,28 @@ def main(
                             for _pkg in _spec:
                                 deps_to_relock.add(MatchSpec(_pkg).name)
 
+                print("relock all packages:", relock_all_packages, flush=True)
+                print(
+                    "initial deps to relock:\n",
+                    pprint.pformat(deps_to_relock),
+                    flush=True,
+                )
+                print(
+                    "ignored packages:\n", pprint.pformat(ignored_packages), flush=True
+                )
+                print(
+                    "include only packages:\n",
+                    pprint.pformat(include_only_packages),
+                    flush=True,
+                )
+
                 deps_to_relock = deps_to_relock - set(ignored_packages)
+
+                print(
+                    "final deps to relock:\n",
+                    pprint.pformat(deps_to_relock),
+                    flush=True,
+                )
 
                 relock_tuples = {platform: [] for platform in envyml["platforms"]}
                 for pkg in deps_to_relock:

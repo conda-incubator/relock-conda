@@ -99,6 +99,7 @@ runs:
       if: ${{ steps.check.outputs.skip != 'true' }}
       shell: bash -leo pipefail {0}
       run: |
+        echo "::group::relock"
         python ${{ github.action_path }}/relock.py \
           --environment-file='${{ inputs.environment-file }}' \
           --lock-file='${{ inputs.lock-file }}' \
@@ -112,6 +113,7 @@ runs:
           echo EOF
         } >> "$GITHUB_OUTPUT"
         rm ${{ github.action_path }}/summary.txt
+        echo "::endgroup::"
 
     - name: open PR
       id: pr
