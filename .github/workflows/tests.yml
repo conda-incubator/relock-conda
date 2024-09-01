@@ -225,15 +225,15 @@ jobs:
         uses: ./
         with:
           environment-file: test-env.yml
-          lock-file: conda-lock.yml
-          ignored-packages: |
-            numpy
-            python
+          lock-file: outdated-conda-lock.yml
           relock-all-packages: false
           github-token: ${{ secrets.GH_PAT }}
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-ignore
+          ignored-packages: |
+            - python
+            - numpy
 
       - name: did it not relock?
         if: steps.relock.outputs.relocked == 'true'

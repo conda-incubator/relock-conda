@@ -166,14 +166,14 @@ def main(
                 shutil.move(backup_lock_file, lock_file)
 
             subprocess.run(
-                'echo "relocked=false" >> "$GITHUB_OUTPUT"',
+                'echo "env_relocked=false" >> "$GITHUB_OUTPUT"',
                 shell=True,
             )
 
             raise e
 
     subprocess.run(
-        f'echo "relocked={"true" if relocked else "false"}" >> "$GITHUB_OUTPUT"',
+        f'echo "env_relocked={"true" if relocked else "false"}" >> "$GITHUB_OUTPUT"',
         shell=True,
     )
 

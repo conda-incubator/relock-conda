@@ -55,7 +55,7 @@ outputs:
     value: ${{ steps.pr.outputs.pull-request-number }}
   relocked:
     description: "whether the environment was relocked"
-    value: ${{ steps.relock.outputs.relocked }}
+    value: ${{ steps.set-output.outputs.relocked }}
 
 runs:
   using: "composite"
@@ -115,7 +115,7 @@ runs:
 
     - name: open PR
       id: pr
-      if: steps.check.outputs.skip != 'true' && steps.relock.outputs.relocked == 'true'
+      if: steps.check.outputs.skip != 'true' && steps.relock.outputs.env_relocked == 'true'
       uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
       with:
         commit-message: relock w/ conda-lock
@@ -131,8 +131,20 @@ runs:
         base: ${{ inputs.base-branch }}
 
     - name: automerge
-      if: steps.check.outputs.skip != 'true' && inputs.automerge == 'true' && steps.relock.outputs.relocked == 'true' && steps.pr.outputs.pull-request-number != ''
+      if: steps.check.outputs.skip != 'true' && inputs.automerge == 'true' && steps.relock.outputs.env_relocked == 'true' && steps.pr.outputs.pull-request-number != ''
       shell: bash -leo pipefail {0}
       run: gh pr merge --merge --auto "${{ steps.pr.outputs.pull-request-number }}"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
+
+    - name: set output
+      id: set-output
+      if: always()
+      run: |
+        if [[ '${{ steps.check.outputs.skip }}' == 'true' ]]; then
+          echo "relocked=false" >> "$GITHUB_OUTPUT"
+        elif [[ '${{ steps.relock.outputs.env_relocked }}' == 'true' && '${{ steps.pr.outputs.pull-request-number }}' != '' ]]; then
+          echo "relocked=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "relocked=false" >> "$GITHUB_OUTPUT"
+        fi
