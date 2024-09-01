@@ -40,6 +40,10 @@ inputs:
       the base branch for PRs (See
       [this documentation](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#events-which-checkout-a-commit)
       for more details.)
+  head-branch:
+    description: 'the head branch for PRs'
+    required: true
+    default: 'relock-conda'
   skip-if-pr-exists:
     description: 'whether to skip relocking if a PR already exists'
     required: true
@@ -51,7 +55,7 @@ outputs:
     value: ${{ steps.pr.outputs.pull-request-number }}
   relocked:
     description: "whether the environment was relocked"
-    value: ${{ steps.relock.outputs.relocked }}
+    value: ${{ steps.set-output.outputs.relocked }}
 
 runs:
   using: "composite"
@@ -63,7 +67,7 @@ runs:
       run: |
         prs=$(gh pr list \
             --repo "$GITHUB_REPOSITORY" \
-            --head 'relock-conda' \
+            --head '${{ inputs.head-branch }}' \
             --json title \
             --jq 'map(select(.title == "relock w/ conda-lock")) | length')
         if [[ ${prs} !=  "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
@@ -95,12 +99,13 @@ runs:
       if: ${{ steps.check.outputs.skip != 'true' }}
       shell: bash -leo pipefail {0}
       run: |
+        echo "::group::relock"
         python ${{ github.action_path }}/relock.py \
-          --environment-file=${{ inputs.environment-file }} \
-          --lock-file=${{ inputs.lock-file }} \
-          --ignored-packages=${{ inputs.ignored-packages }} \
-          --relock-all-packages=${{ inputs.relock-all-packages }} \
-          --include-only-packages=${{ inputs.include-only-packages }} \
+          --environment-file='${{ inputs.environment-file }}' \
+          --lock-file='${{ inputs.lock-file }}' \
+          --ignored-packages='${{ inputs.ignored-packages }}' \
+          --relock-all-packages='${{ inputs.relock-all-packages }}' \
+          --include-only-packages='${{ inputs.include-only-packages }}' \
           > ${{ github.action_path }}/summary.txt
         {
           echo 'summary<<EOF'
@@ -108,11 +113,11 @@ runs:
           echo EOF
         } >> "$GITHUB_OUTPUT"
         rm ${{ github.action_path }}/summary.txt
-        ls -lah
+        echo "::endgroup::"
 
     - name: open PR
       id: pr
-      if: steps.check.outputs.skip != 'true' && steps.relock.outputs.relocked == 'true'
+      if: steps.check.outputs.skip != 'true' && steps.relock.outputs.env_relocked == 'true'
       uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
       with:
         commit-message: relock w/ conda-lock
@@ -121,15 +126,28 @@ runs:
 
 
           ${{ steps.relock.outputs.summary }}"
-        branch: relock-conda
+        branch: ${{ inputs.head-branch }}
         delete-branch: true
         token: ${{ inputs.github-token }}
         labels: dependencies
         base: ${{ inputs.base-branch }}
 
     - name: automerge
-      if: steps.check.outputs.skip != 'true' && inputs.automerge == 'true' && steps.relock.outputs.relocked == 'true' && steps.pr.outputs.pull-request-number != ''
+      if: steps.check.outputs.skip != 'true' && inputs.automerge == 'true' && steps.relock.outputs.env_relocked == 'true' && steps.pr.outputs.pull-request-number != ''
       shell: bash -leo pipefail {0}
       run: gh pr merge --merge --auto "${{ steps.pr.outputs.pull-request-number }}"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
+
+    - name: set output
+      id: set-output
+      if: always()
+      shell: bash -leo pipefail {0}
+      run: |
+        if [[ '${{ steps.check.outputs.skip }}' == 'true' ]]; then
+          echo "relocked=false" >> "$GITHUB_OUTPUT"
+        elif [[ '${{ steps.relock.outputs.env_relocked }}' == 'true' && '${{ steps.pr.outputs.pull-request-number }}' != '' ]]; then
+          echo "relocked=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "relocked=false" >> "$GITHUB_OUTPUT"
+        fi
