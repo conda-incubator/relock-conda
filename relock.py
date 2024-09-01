@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 import os
 import shutil
 import subprocess
@@ -123,7 +124,11 @@ def main(
                 else:
                     deps_to_relock = set()
                     for _spec in envyml["dependencies"]:
-                        deps_to_relock.add(MatchSpec(_spec).name)
+                        if not isinstance(_spec, Mapping):
+                            deps_to_relock.add(MatchSpec(_spec).name)
+                        else:
+                            for _pkg in _spec:
+                                deps_to_relock.add(MatchSpec(_pkg).name)
 
                 deps_to_relock = deps_to_relock - set(ignored_packages)
 

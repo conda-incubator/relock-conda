@@ -89,6 +89,39 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
 
+  tests-ignore:
+    name: test ignore
+    runs-on: "ubuntu-latest"
+    if: github.event.pull_request.title != 'relock w/ conda-lock'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: relock
+        id: relock
+        uses: ./
+        with:
+          environment-file: test-env.yml
+          lock-file: conda-lock.yml
+          ignored-packages: |
+            numpy
+            python
+          relock-all-packages: false
+          github-token: ${{ secrets.GH_PAT }}
+          automerge: false
+          base-branch: ${{ github.head_ref }}
+
+      - name: did it not relock?
+        if: steps.relock.outputs.relocked == 'true'
+        run: exit 1
+
+      - name: close PR
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+
   tests-no-lock:
     name: test no update
     needs: tests-lock

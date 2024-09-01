@@ -96,11 +96,11 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         python ${{ github.action_path }}/relock.py \
-          --environment-file=${{ inputs.environment-file }} \
-          --lock-file=${{ inputs.lock-file }} \
-          --ignored-packages=${{ inputs.ignored-packages }} \
-          --relock-all-packages=${{ inputs.relock-all-packages }} \
-          --include-only-packages=${{ inputs.include-only-packages }} \
+          --environment-file='${{ inputs.environment-file }}' \
+          --lock-file='${{ inputs.lock-file }}' \
+          --ignored-packages='${{ inputs.ignored-packages }}' \
+          --relock-all-packages='${{ inputs.relock-all-packages }}' \
+          --include-only-packages='${{ inputs.include-only-packages }}' \
           > ${{ github.action_path }}/summary.txt
         {
           echo 'summary<<EOF'
@@ -108,7 +108,6 @@ runs:
           echo EOF
         } >> "$GITHUB_OUTPUT"
         rm ${{ github.action_path }}/summary.txt
-        ls -lah
 
     - name: open PR
       id: pr
