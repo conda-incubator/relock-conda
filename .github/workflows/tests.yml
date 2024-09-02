@@ -90,6 +90,39 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
 
+  tests-file:
+    name: test updates w/ file
+    runs-on: "ubuntu-latest"
+    if: github.event.pull_request.title != 'relock w/ conda-lock'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: make a copy of lock file
+        shell: bash -leo pipefail {0}
+        run: |
+          cp conda-lock.yml old-conda-lock.yml
+
+      - name: relock
+        id: relock
+        uses: ./
+        with:
+          environment-file: test-env.yml
+          lock-file: conda-lock.yml
+          ignored-packages: ''
+          relock-all-packages: false
+          github-token: ${{ secrets.GH_PAT }}
+          action: file
+
+      - name: did it relock?
+        if: steps.relock.outputs.relocked != 'true'
+        run: exit 1
+
+      - name: test that lock file is different
+        if: steps.relock.outputs.relocked == 'true'
+        shell: bash
+        run: |
+          diff conda-lock.yml old-conda-lock.yml && exit 0 || exit 1
+
   tests-no-lock:
     name: test no update
     runs-on: "ubuntu-latest"
