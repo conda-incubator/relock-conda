@@ -97,6 +97,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: 3.11
+          channels: conda-forge
+          channel-priority: strict
+          show-channel-urls: true
+          miniforge-version: latest
+
+      - name: make the lock file
+        shell: bash -leo pipefail {0}
+        run: |
+          conda install --yes conda-lock
+          conda-lock lock --file test-env.yml --lockfile conda-lockk.yml
+
       - name: make a copy of lock file
         shell: bash -leo pipefail {0}
         run: |

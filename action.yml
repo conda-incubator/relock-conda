@@ -72,6 +72,11 @@ runs:
       if: inputs.action == 'pr'
       shell: bash -leo pipefail {0}
       run: |
+        if [[ "${INPUT_ACTION}" != "pr" ]]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+        fi
+
         prs=$(gh pr list \
             --repo "$GITHUB_REPOSITORY" \
             --head '${{ inputs.head-branch }}' \
@@ -85,13 +90,7 @@ runs:
       env:
         GH_TOKEN: ${{ inputs.github-token }}
         SKIP_IF_PR_EXISTS: ${{ inputs.skip-if-pr-exists }}
-
-    - name: do not skip for non-PR actions
-      id: check
-      if: inputs.action != 'pr'
-      shell: bash -leo pipefail {0}
-      run: |
-        echo "skip=false" >> "$GITHUB_OUTPUT"
+        INPUT_ACTION: ${{ inputs.action }}
 
     - name: setup conda-lock
       if: ${{ steps.check.outputs.skip != 'true' }}
