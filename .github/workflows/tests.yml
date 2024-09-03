@@ -109,7 +109,9 @@ jobs:
         shell: bash -leo pipefail {0}
         run: |
           conda install --yes conda-lock
-          conda-lock lock --file test-env.yml
+          cp test-env.yml old-test-env.yml
+          echo "  - python =3.8" >> old-test-env.yml
+          conda-lock lock --file old-test-env.yml
 
       - name: make a copy of lock file
         shell: bash -leo pipefail {0}
