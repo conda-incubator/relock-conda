@@ -167,27 +167,28 @@ runs:
       if: always()
       shell: bash -leo pipefail {0}
       run: |
+        res=""
+
         # if we skipped, we did not relock
-        if [[ '${{ steps.check.outputs.skip }}' == 'true' ]]; then
-          echo "relocked=false" >> "$GITHUB_OUTPUT"
-          exit 0
+        if [[ "${res}" == "" && '${{ steps.check.outputs.skip }}' == 'true' ]]; then
+          res="false"
         fi
 
-        if [[ '${{ steps.relock.outputs.env_relocked }}' == 'true' ]]; then
+        if [[ "${res}" == "" && '${{ steps.relock.outputs.env_relocked }}' == 'true' ]]; then
           # for a PR, we need to know if it was opened
           if [[ '${{ inputs.action }}' == 'pr' ]]; then
             if [[ '${{ steps.pr.outputs.pull-request-number }}' != '' ]]; then
-              echo "relocked=true" >> "$GITHUB_OUTPUT"
+              res="true"
             else
-              echo "relocked=false" >> "$GITHUB_OUTPUT"
+              res="false"
             fi
-            exit 0
+          else
+            res="true"
           fi
-
-          # for a file, we know it was relocked
-          echo "relocked=true" >> "$GITHUB_OUTPUT"
-          exit 0
         fi
 
-        # if we get here then it did not relock
-        echo "relocked=false" >> "$GITHUB_OUTPUT"
+        if [[ "${res}" == "" ]]; then
+          res="false"
+        fi
+
+        echo "relocked=${res}" >> "$GITHUB_OUTPUT"
