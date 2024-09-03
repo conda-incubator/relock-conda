@@ -109,7 +109,7 @@ jobs:
         shell: bash -leo pipefail {0}
         run: |
           conda install --yes conda-lock
-          conda-lock lock --file test-env.yml --lockfile conda-lockk.yml
+          conda-lock lock --file test-env.yml
 
       - name: make a copy of lock file
         shell: bash -leo pipefail {0}
@@ -135,6 +135,8 @@ jobs:
         if: steps.relock.outputs.relocked == 'true'
         shell: bash
         run: |
+          diff conda-lock.yml old-conda-lock.yml
+          echo $?
           diff conda-lock.yml old-conda-lock.yml && exit 0 || exit 1
 
   tests-no-lock:
