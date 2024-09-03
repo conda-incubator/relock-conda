@@ -56,7 +56,7 @@ jobs:
           lock-file: conda-lock.yml
           ignored-packages: ''
           relock-all-packages: false
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-lock
@@ -80,7 +80,7 @@ jobs:
           grep numpy conda-lock.yml
           grep python conda-lock.yml
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: close PR
         if: always()
@@ -88,7 +88,7 @@ jobs:
         shell: bash
         run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   tests-file:
     name: test updates w/ file
@@ -126,7 +126,7 @@ jobs:
           lock-file: conda-lock.yml
           ignored-packages: ''
           relock-all-packages: false
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           action: file
 
       - name: did it relock?
@@ -137,9 +137,11 @@ jobs:
         if: steps.relock.outputs.relocked == 'true'
         shell: bash
         run: |
-          diff conda-lock.yml old-conda-lock.yml
-          echo $?
-          diff conda-lock.yml old-conda-lock.yml && exit 0 || exit 1
+          val=$(diff conda-lock.yml old-conda-lock.yml)
+          if [[ "${val}" == "" ]]; then
+            echo "lock files are the same"
+            exit 1
+          fi
 
   tests-no-lock:
     name: test no update
@@ -170,7 +172,7 @@ jobs:
           lock-file: conda-lockk.yml
           ignored-packages: ''
           relock-all-packages: false
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-no-lock
@@ -185,7 +187,7 @@ jobs:
         shell: bash
         run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   tests-skip-existing-part-1:
     name: test skip existing part 1
@@ -204,7 +206,7 @@ jobs:
           lock-file: conda-lock.yml
           ignored-packages: ''
           relock-all-packages: false
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-skip-existing
@@ -228,7 +230,7 @@ jobs:
           grep numpy conda-lock.yml
           grep python conda-lock.yml
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   tests-skip-existing-part-2:
     name: test skip existing part 2
@@ -246,7 +248,7 @@ jobs:
           lock-file: conda-lock.yml
           ignored-packages: ''
           relock-all-packages: false
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-skip-existing
@@ -262,7 +264,7 @@ jobs:
         shell: bash
         run: gh pr close ${{ needs.tests-skip-existing-part-1.outputs.pull-request-number }}
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   tests-ignore:
     name: test ignore
@@ -278,7 +280,7 @@ jobs:
           environment-file: test-env.yml
           lock-file: outdated-conda-lock.yml
           relock-all-packages: false
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-ignore
@@ -296,4 +298,4 @@ jobs:
         shell: bash
         run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

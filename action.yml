@@ -174,6 +174,7 @@ runs:
           res="false"
         fi
 
+        # if the env was relocked, then we look at PR vs file
         if [[ "${res}" == "" && '${{ steps.relock.outputs.env_relocked }}' == 'true' ]]; then
           # for a PR, we need to know if it was opened
           if [[ '${{ inputs.action }}' == 'pr' ]]; then
@@ -183,10 +184,12 @@ runs:
               res="false"
             fi
           else
+            # if not a PR, then we updated the file
             res="true"
           fi
         fi
 
+        # if we get here, default to false
         if [[ "${res}" == "" ]]; then
           res="false"
         fi
