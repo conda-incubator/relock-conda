@@ -73,20 +73,22 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         if [[ "${INPUT_ACTION}" != "pr" ]]; then
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            exit 0
+            res="false"
+        else
+          prs=$(gh pr list \
+              --repo "$GITHUB_REPOSITORY" \
+              --head '${{ inputs.head-branch }}' \
+              --json title \
+              --jq 'map(select(.title == "relock w/ conda-lock")) | length')
+
+          if [[ ${prs} !=  "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
+              res="true"
+          else
+              res="false"
+          fi
         fi
 
-        prs=$(gh pr list \
-            --repo "$GITHUB_REPOSITORY" \
-            --head '${{ inputs.head-branch }}' \
-            --json title \
-            --jq 'map(select(.title == "relock w/ conda-lock")) | length')
-        if [[ ${prs} !=  "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-        else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-        fi
+        echo "skip=${res}" >> "$GITHUB_OUTPUT"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
         SKIP_IF_PR_EXISTS: ${{ inputs.skip-if-pr-exists }}
