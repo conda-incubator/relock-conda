@@ -31,6 +31,12 @@ inputs:
   github-token:
     description: 'GitHub personal access token to use for making PRs'
     required: true
+  action:
+    description: >
+      the action to take if the lock file is updated: `pr` will make a PR; `file` will leave the updated lock file
+      in the current working directory
+    required: true
+    default: 'pr'
   automerge:
     description: 'whether to automatically merge the PR'
     required: true
@@ -46,6 +52,10 @@ inputs:
     default: 'relock-conda'
   skip-if-pr-exists:
     description: 'whether to skip relocking if a PR already exists'
+    required: true
+    default: false
+  draft:
+    description: 'whether to open the PR as a draft'
     required: true
     default: false
 
@@ -65,19 +75,27 @@ runs:
       id: check
       shell: bash -leo pipefail {0}
       run: |
-        prs=$(gh pr list \
-            --repo "$GITHUB_REPOSITORY" \
-            --head '${{ inputs.head-branch }}' \
-            --json title \
-            --jq 'map(select(.title == "relock w/ conda-lock")) | length')
-        if [[ ${prs} !=  "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
+        if [[ "${INPUT_ACTION}" != "pr" ]]; then
+            res="false"
         else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
+          prs=$(gh pr list \
+              --repo "$GITHUB_REPOSITORY" \
+              --head '${{ inputs.head-branch }}' \
+              --json title \
+              --jq 'map(select(.title == "relock w/ conda-lock")) | length')
+
+          if [[ ${prs} !=  "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
+              res="true"
+          else
+              res="false"
+          fi
         fi
+
+        echo "skip=${res}" >> "$GITHUB_OUTPUT"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
         SKIP_IF_PR_EXISTS: ${{ inputs.skip-if-pr-exists }}
+        INPUT_ACTION: ${{ inputs.action }}
 
     - name: setup conda-lock
       if: ${{ steps.check.outputs.skip != 'true' }}
@@ -117,7 +135,10 @@ runs:
 
     - name: open PR
       id: pr
-      if: steps.check.outputs.skip != 'true' && steps.relock.outputs.env_relocked == 'true'
+      if: >-
+        steps.check.outputs.skip != 'true'
+        && steps.relock.outputs.env_relocked == 'true'
+        && inputs.action == 'pr'
       uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
       with:
         commit-message: relock w/ conda-lock
@@ -131,9 +152,15 @@ runs:
         token: ${{ inputs.github-token }}
         labels: dependencies
         base: ${{ inputs.base-branch }}
+        draft: ${{ inputs.draft }}
 
     - name: automerge
-      if: steps.check.outputs.skip != 'true' && inputs.automerge == 'true' && steps.relock.outputs.env_relocked == 'true' && steps.pr.outputs.pull-request-number != ''
+      if: >-
+        steps.check.outputs.skip != 'true'
+        && inputs.automerge == 'true'
+        && steps.relock.outputs.env_relocked == 'true'
+        && steps.pr.outputs.pull-request-number != ''
+        && inputs.action == 'pr'
       shell: bash -leo pipefail {0}
       run: gh pr merge --merge --auto "${{ steps.pr.outputs.pull-request-number }}"
       env:
@@ -144,10 +171,31 @@ runs:
       if: always()
       shell: bash -leo pipefail {0}
       run: |
-        if [[ '${{ steps.check.outputs.skip }}' == 'true' ]]; then
-          echo "relocked=false" >> "$GITHUB_OUTPUT"
-        elif [[ '${{ steps.relock.outputs.env_relocked }}' == 'true' && '${{ steps.pr.outputs.pull-request-number }}' != '' ]]; then
-          echo "relocked=true" >> "$GITHUB_OUTPUT"
-        else
-          echo "relocked=false" >> "$GITHUB_OUTPUT"
+        res=""
+
+        # if we skipped, we did not relock
+        if [[ "${res}" == "" && '${{ steps.check.outputs.skip }}' == 'true' ]]; then
+          res="false"
         fi
+
+        # if the env was relocked, then we look at PR vs file
+        if [[ "${res}" == "" && '${{ steps.relock.outputs.env_relocked }}' == 'true' ]]; then
+          # for a PR, we need to know if it was opened
+          if [[ '${{ inputs.action }}' == 'pr' ]]; then
+            if [[ '${{ steps.pr.outputs.pull-request-number }}' != '' ]]; then
+              res="true"
+            else
+              res="false"
+            fi
+          else
+            # if not a PR, then we updated the file
+            res="true"
+          fi
+        fi
+
+        # if we get here, default to false
+        if [[ "${res}" == "" ]]; then
+          res="false"
+        fi
+
+        echo "relocked=${res}" >> "$GITHUB_OUTPUT"

@@ -56,10 +56,11 @@ jobs:
           lock-file: conda-lock.yml
           ignored-packages: ''
           relock-all-packages: false
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-lock
+          draft: true
 
       - name: did it relock?
         if: steps.relock.outputs.relocked != 'true'
@@ -80,7 +81,7 @@ jobs:
           grep numpy conda-lock.yml
           grep python conda-lock.yml
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: close PR
         if: always()
@@ -88,7 +89,61 @@ jobs:
         shell: bash
         run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  tests-file:
+    name: test updates w/ file
+    runs-on: "ubuntu-latest"
+    if: github.event.pull_request.title != 'relock w/ conda-lock'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: 3.11
+          channels: conda-forge
+          channel-priority: strict
+          show-channel-urls: true
+          miniforge-version: latest
+
+      - name: make the lock file
+        shell: bash -leo pipefail {0}
+        run: |
+          conda install --yes conda-lock
+          cp test-env.yml old-test-env.yml
+          echo "  - python =3.8" >> old-test-env.yml
+          conda-lock lock --file old-test-env.yml
+
+      - name: make a copy of lock file
+        shell: bash -leo pipefail {0}
+        run: |
+          cp conda-lock.yml old-conda-lock.yml
+
+      - name: relock
+        id: relock
+        uses: ./
+        with:
+          environment-file: test-env.yml
+          lock-file: conda-lock.yml
+          ignored-packages: ''
+          relock-all-packages: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          action: file
+          draft: true
+
+      - name: did it relock?
+        if: steps.relock.outputs.relocked != 'true'
+        run: exit 1
+
+      - name: test that lock file is different
+        if: steps.relock.outputs.relocked == 'true'
+        shell: bash
+        run: |
+          val=$(diff conda-lock.yml old-conda-lock.yml || :)
+          if [[ "${val}" == "" ]]; then
+            echo "lock files are the same"
+            exit 1
+          fi
 
   tests-no-lock:
     name: test no update
@@ -119,10 +174,11 @@ jobs:
           lock-file: conda-lockk.yml
           ignored-packages: ''
           relock-all-packages: false
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-no-lock
+          draft: true
 
       - name: did it not relock?
         if: steps.relock.outputs.relocked == 'true'
@@ -134,7 +190,7 @@ jobs:
         shell: bash
         run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   tests-skip-existing-part-1:
     name: test skip existing part 1
@@ -153,10 +209,11 @@ jobs:
           lock-file: conda-lock.yml
           ignored-packages: ''
           relock-all-packages: false
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-skip-existing
+          draft: true
 
       - name: did it relock?
         if: steps.relock.outputs.relocked != 'true'
@@ -177,7 +234,7 @@ jobs:
           grep numpy conda-lock.yml
           grep python conda-lock.yml
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   tests-skip-existing-part-2:
     name: test skip existing part 2
@@ -195,11 +252,12 @@ jobs:
           lock-file: conda-lock.yml
           ignored-packages: ''
           relock-all-packages: false
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-skip-existing
           skip-if-pr-exists: true
+          draft: true
 
       - name: did it relock?
         if: steps.relock.outputs.relocked == 'true'
@@ -211,7 +269,7 @@ jobs:
         shell: bash
         run: gh pr close ${{ needs.tests-skip-existing-part-1.outputs.pull-request-number }}
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   tests-ignore:
     name: test ignore
@@ -227,13 +285,14 @@ jobs:
           environment-file: test-env.yml
           lock-file: outdated-conda-lock.yml
           relock-all-packages: false
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-ignore
           ignored-packages: |
             python
             numpy
+          draft: true
 
       - name: did it not relock?
         if: steps.relock.outputs.relocked == 'true'
@@ -245,4 +304,4 @@ jobs:
         shell: bash
         run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
