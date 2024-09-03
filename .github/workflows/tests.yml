@@ -137,7 +137,7 @@ jobs:
         if: steps.relock.outputs.relocked == 'true'
         shell: bash
         run: |
-          val=$(diff conda-lock.yml old-conda-lock.yml)
+          val=$(diff conda-lock.yml old-conda-lock.yml || :)
           if [[ "${val}" == "" ]]; then
             echo "lock files are the same"
             exit 1
