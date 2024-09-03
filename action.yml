@@ -73,7 +73,6 @@ runs:
     # https://stackoverflow.com/a/73828715/1745538
     - name: skip if PR already exists
       id: check
-      if: inputs.action == 'pr'
       shell: bash -leo pipefail {0}
       run: |
         if [[ "${INPUT_ACTION}" != "pr" ]]; then
