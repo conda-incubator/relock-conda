@@ -54,6 +54,10 @@ inputs:
     description: 'whether to skip relocking if a PR already exists'
     required: true
     default: false
+  draft:
+    description: 'whether to open the PR as a draft'
+    required: true
+    default: false
 
 outputs:
   pull-request-number:
@@ -149,6 +153,7 @@ runs:
         token: ${{ inputs.github-token }}
         labels: dependencies
         base: ${{ inputs.base-branch }}
+        draft: ${{ inputs.draft }}
 
     - name: automerge
       if: >-

@@ -60,6 +60,9 @@ jobs:
 
           # whether to skip relocking if a PR already exists
           skip-if-pr-exists: false  # default
+
+          # whether to open the PR as a draft
+          draft: false  # default
 ```
 
 See the [action.yml](action.yml) for details on possible inputs and options.

@@ -60,6 +60,7 @@ jobs:
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-lock
+          draft: true
 
       - name: did it relock?
         if: steps.relock.outputs.relocked != 'true'
@@ -128,6 +129,7 @@ jobs:
           relock-all-packages: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
           action: file
+          draft: true
 
       - name: did it relock?
         if: steps.relock.outputs.relocked != 'true'
@@ -176,6 +178,7 @@ jobs:
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-no-lock
+          draft: true
 
       - name: did it not relock?
         if: steps.relock.outputs.relocked == 'true'
@@ -210,6 +213,7 @@ jobs:
           automerge: false
           base-branch: ${{ github.head_ref }}
           head-branch: tests-skip-existing
+          draft: true
 
       - name: did it relock?
         if: steps.relock.outputs.relocked != 'true'
@@ -253,6 +257,7 @@ jobs:
           base-branch: ${{ github.head_ref }}
           head-branch: tests-skip-existing
           skip-if-pr-exists: true
+          draft: true
 
       - name: did it relock?
         if: steps.relock.outputs.relocked == 'true'
@@ -287,6 +292,7 @@ jobs:
           ignored-packages: |
             python
             numpy
+          draft: true
 
       - name: did it not relock?
         if: steps.relock.outputs.relocked == 'true'
