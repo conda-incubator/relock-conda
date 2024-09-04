@@ -183,12 +183,15 @@ def main(
                 if any(relock_tuples[platform] for platform in envyml["platforms"]):
                     _reformat_lockfile(lock_file)
 
-                    print("The following packages have been updated:\n", flush=True)
+                    msg = "The following packages have been updated:\n\n"
                     for platform in envyml["platforms"]:
-                        print(f"  platform: {platform}", flush=True)
+                        msg += f"  platform: {platform}\n"
                         for pkg, old_ver, new_ver in relock_tuples[platform]:
-                            print(f"    - {pkg}: {old_ver} -> {new_ver}", flush=True)
-                        print("", flush=True)
+                            msg += f"    - {pkg}: {old_ver} -> {new_ver}\n"
+                        msg += "\n"
+
+                    print(msg, flush=True, file=sys.stderr)
+                    print(msg, flush=True)
 
                     relocked = True
                 else:
