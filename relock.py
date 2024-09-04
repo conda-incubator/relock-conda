@@ -89,6 +89,7 @@ def main(
                 check=True,
                 capture_output=True,
             )
+            _reformat_lockfile(lock_file)
 
             if not have_existing_lock_file:
                 print(
@@ -181,8 +182,6 @@ def main(
                             )
 
                 if any(relock_tuples[platform] for platform in envyml["platforms"]):
-                    _reformat_lockfile(lock_file)
-
                     msg = "The following packages have been updated:\n\n"
                     for platform in envyml["platforms"]:
                         msg += f"  platform: {platform}\n"
