@@ -129,7 +129,7 @@ runs:
           --include-only-packages='${{ inputs.include-only-packages }}' \
           > ${{ github.action_path }}/summary.txt
         {
-          echo 'summary=<<EOF'
+          echo 'summary<<EOF'
           cat ${{ github.action_path }}/summary.txt
           echo EOF
         } >> "$GITHUB_OUTPUT"
