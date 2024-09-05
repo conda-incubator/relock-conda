@@ -142,7 +142,7 @@ runs:
         steps.check.outputs.skip != 'true'
         && steps.relock.outputs.env_relocked == 'true'
         && inputs.action == 'pr'
-      uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
+      uses: peter-evans/create-pull-request@8867c4aba1b742c39f8d0ba35429c2dfa4b6cb20 # v6
       with:
         commit-message: relock w/ conda-lock
         title: relock w/ conda-lock
