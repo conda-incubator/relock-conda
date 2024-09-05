@@ -66,6 +66,9 @@ outputs:
   relocked:
     description: "whether the environment was relocked"
     value: ${{ steps.set-output.outputs.relocked }}
+  summary:
+    description: "the summary of the relock operation"
+    value: ${{ steps.relock.outputs.summary }}
 
 runs:
   using: "composite"
@@ -126,7 +129,7 @@ runs:
           --include-only-packages='${{ inputs.include-only-packages }}' \
           > ${{ github.action_path }}/summary.txt
         {
-          echo 'summary<<EOF'
+          echo 'summary=<<EOF'
           cat ${{ github.action_path }}/summary.txt
           echo EOF
         } >> "$GITHUB_OUTPUT"
