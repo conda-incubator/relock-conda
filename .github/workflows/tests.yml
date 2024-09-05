@@ -66,6 +66,14 @@ jobs:
         if: steps.relock.outputs.relocked != 'true'
         run: exit 1
 
+      - name: check the summary
+        if: steps.relock.outputs.relocked == 'true'
+        run: |
+          echo ${{ steps.relock.outputs.summary }}
+          if [[ "${{ steps.relock.outputs.summary }}" == "" ]]; then
+            exit 1
+          fi
+
       - name: test that PR is OK
         if: steps.relock.outputs.relocked == 'true'
         shell: bash

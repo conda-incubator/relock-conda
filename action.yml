@@ -66,6 +66,9 @@ outputs:
   relocked:
     description: "whether the environment was relocked"
     value: ${{ steps.set-output.outputs.relocked }}
+  summary:
+    description: "the summary of the relock operation"
+    value: ${{ steps.relock.outputs.summary }}
 
 runs:
   using: "composite"
