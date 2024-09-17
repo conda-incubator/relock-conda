@@ -1,5 +1,5 @@
 # relock-conda
-[![tests](https://github.com/beckermr/relock-conda/actions/workflows/tests.yml/badge.svg)](https://github.com/beckermr/relock-conda/actions/workflows/tests.yml) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/beckermr/relock-conda/main.svg)](https://results.pre-commit.ci/latest/github/beckermr/relock-conda/main)
+[![tests](https://github.com/conda-incubator/relock-conda/actions/workflows/tests.yml/badge.svg)](https://github.com/conda-incubator/relock-conda/actions/workflows/tests.yml) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/conda-incubator/relock-conda/main.svg)](https://results.pre-commit.ci/latest/github/conda-incubator/relock-conda/main)
 
 GitHub action to relock conda environments using conda-lock
 
@@ -20,7 +20,7 @@ jobs:
     name: test
     steps:
       - name: run
-        uses: beckermr/relock-conda@main
+        uses: conda-incubator/relock-conda@main
         with:
           # A GitHub personal access token is required
           github-token: ${{ secrets.GITHUB_PAT }}
