@@ -148,6 +148,7 @@ runs:
             && startsWith(github.event.comment.body, '/relock-conda')
           )
         )
+      shell: bash -leo pipefail {0}
       run: |
         python ${{ github.action_path }}/commit_file.py \
           --repo="${{ github.repository }}" \
