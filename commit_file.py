@@ -6,9 +6,9 @@ import github
 
 def _get_branch(ref):
     if ref.startswith("refs/heads/"):
-        return ref[len("refs/heads/"):]
+        return ref[len("refs/heads/") :]
     elif ref.startswith("refs/pull/"):
-        return "pull/" + ref[len("refs/pull/"):-len("/merge")] + "/head"
+        return "pull/" + ref[len("refs/pull/") : -len("/merge")] + "/head"
     else:
         return ref
 
@@ -23,14 +23,13 @@ def main(repo, ref, filename, commit_message):
     with open(filename, "r") as f:
         data = f.read()
 
-    gh_token = os.environ['GH_TOKEN']
+    gh_token = os.environ["GH_TOKEN"]
     gh = github.Github(auth=github.Auth.Token(gh_token))
     repo = gh.get_repo(repo)
     try:
         contents = repo.get_contents(filename, ref=ref)
     except github.UnknownObjectException:
         contents = None
-
 
     if contents is None:
         repo.create_file(
