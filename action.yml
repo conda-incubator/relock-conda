@@ -111,6 +111,7 @@ runs:
           ruamel.yaml
           conda
           conda-lock
+          pygithub
         condarc: |
           channels:
             - conda-forge
@@ -136,12 +137,33 @@ runs:
         rm ${{ github.action_path }}/summary.txt
         echo "::endgroup::"
 
+    - name: commit changes
+      if: >-
+        steps.check.outputs.skip != 'true'
+        && steps.relock.outputs.env_relocked == 'true'
+        && (
+          inputs.action == 'commit'
+          || (
+            github.event_name == 'issue_comment'
+            && startsWith(github.event.comment.body, '/relock-conda')
+          )
+        )
+      run: |
+        python ${{ github.action_path }}/commit_file.py \
+          --repo="${{ github.repository }}" \
+          --ref="${{ github.ref }}" \
+          --filename=${{ inputs.lock-file }} \
+          --commit-message="relock w/ conda-lock"
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+
     - name: open PR
       id: pr
       if: >-
         steps.check.outputs.skip != 'true'
         && steps.relock.outputs.env_relocked == 'true'
         && inputs.action == 'pr'
+        && github.event_name != 'issue_comment'
       uses: peter-evans/create-pull-request@6cd32fd93684475c31847837f87bb135d40a2b79
       with:
         commit-message: relock w/ conda-lock
@@ -164,6 +186,7 @@ runs:
         && steps.relock.outputs.env_relocked == 'true'
         && steps.pr.outputs.pull-request-number != ''
         && inputs.action == 'pr'
+        && github.event_name != 'issue_comment'
       shell: bash -leo pipefail {0}
       run: gh pr merge --merge --auto "${{ steps.pr.outputs.pull-request-number }}"
       env:

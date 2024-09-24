@@ -3,9 +3,11 @@
 
 GitHub action to relock conda environments using conda-lock
 
-This action runs [conda-lock](https://github.com/conda/conda-lock) to relock a conda environment and makes a PR
-with the changes if any are found. By default, a PR is only made if a package listed in the input `environment.yml`
-file is updated.
+This action runs [conda-lock](https://github.com/conda/conda-lock) to relock a conda environment. Some features include
+
+- responding to comments on PRs to relock the environment
+- running on a schedule to relock the environment
+- customization of which package version updates trigger a relock
 
 ## Usage
 
@@ -13,12 +15,16 @@ file is updated.
 name: relock conda
 on:
   workflow_dispatch:
+  issue_comment:
 
 jobs:
   test:
     runs-on: ubuntu-latest
     name: test
     steps:
+      - name: checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+
       - name: run
         uses: conda-incubator/relock-conda@main
         with:
@@ -43,6 +49,9 @@ jobs:
 
           # action to take if we relock
           # one of 'pr' (make a PR) or 'file' (leave new lock file in CWD)
+          # or 'commit' (commit new lock file to the repo)
+          # if triggered by a comment, this input is ignored and the action
+          # will always commit the new lock file
           action: 'pr'  # default
 
           # these options apply only if we are making PRs
