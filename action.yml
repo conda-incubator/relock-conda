@@ -150,13 +150,16 @@ runs:
         )
       shell: bash -leo pipefail {0}
       run: |
-        python ${{ github.action_path }}/commit_file.py \
-          --repo="${{ github.repository }}" \
-          --ref="${{ github.ref }}" \
-          --filename=${{ inputs.lock-file }} \
-          --commit-message="relock w/ conda-lock"
-      env:
-        GH_TOKEN: ${{ inputs.github-token }}
+        git add ${{ inputs.lock-file }}
+        git commit -m "relock w/ conda-lock"
+        git push
+      #   python ${{ github.action_path }}/commit_file.py \
+      #     --repo="${{ github.repository }}" \
+      #     --ref="${{ github.ref }}" \
+      #     --filename=${{ inputs.lock-file }} \
+      #     --commit-message="relock w/ conda-lock"
+      # env:
+      #   GH_TOKEN: ${{ inputs.github-token }}
 
     - name: open PR
       id: pr
