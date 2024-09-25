@@ -30,7 +30,7 @@ jobs:
 
       - name: move relock code to current branch
         run: |
-          if [[ "${COMMENT_IS_PR}" == "false" ]]; then
+          if [[ "${COMMENT_IS_PR}" == "true" ]]; then
             branch=pull/${{ github.event.number }}/head
           else
             branch=main
@@ -72,7 +72,7 @@ jobs:
       - name: cleanup
         if: always()
         run: |
-          if [[ "${COMMENT_IS_PR}" == "false" ]]; then
+          if [[ "${COMMENT_IS_PR}" == "true" ]]; then
             branch=pull/${{ github.event.number }}/head
           else
             branch=main
