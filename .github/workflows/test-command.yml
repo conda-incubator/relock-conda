@@ -44,7 +44,7 @@ jobs:
         run: |
           gh pr comment 112 --body "/relock-conda"
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.TEST_PAT }}
 
       - name: wait for relock
         run: |
