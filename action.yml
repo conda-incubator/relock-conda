@@ -79,7 +79,7 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         if [[ "${EVENT_NAME}" == "issue_comment" ]]; then
-          if [[ "${HAS_RELOCK_SLUG:}" == "false" ]]; then
+          if [[ "${HAS_RELOCK_SLUG}" == "false" ]]; then
             res="true"
           else
             res="false"
