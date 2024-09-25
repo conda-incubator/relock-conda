@@ -116,6 +116,15 @@ runs:
           channels:
             - conda-forge
 
+    - name: checkout PR if running on an issue
+      if: >-
+        steps.check.outputs.skip != 'true'
+        && github.event_name == 'issue_comment'
+        && startsWith(github.event.comment.body, '/relock-conda')
+      shell: bash -leo pipefail {0}
+      run: |
+        gh pr checkout ${{ github.event.issue.number }}
+
     - name: relock
       id: relock
       if: ${{ steps.check.outputs.skip != 'true' }}
@@ -155,13 +164,6 @@ runs:
         git add ${{ inputs.lock-file }}
         git commit -m "relock w/ conda-lock"
         git push
-      #   python ${{ github.action_path }}/commit_file.py \
-      #     --repo="${{ github.repository }}" \
-      #     --ref="${{ github.ref }}" \
-      #     --filename=${{ inputs.lock-file }} \
-      #     --commit-message="relock w/ conda-lock"
-      # env:
-      #   GH_TOKEN: ${{ inputs.github-token }}
 
     - name: open PR
       id: pr
