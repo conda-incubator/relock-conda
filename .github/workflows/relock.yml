@@ -12,13 +12,6 @@ jobs:
       - name: checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
 
-      - name: setup
-        run: |
-          gh pr checkout ${{ github.event.issue.number }}
-          cp outdated-conda-lock.yml conda-lock.yml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: run
         uses: conda-incubator/relock-conda@commands
         with:
