@@ -1,5 +1,5 @@
 # relock-conda
-[![tests](https://github.com/conda-incubator/relock-conda/actions/workflows/tests.yml/badge.svg)](https://github.com/conda-incubator/relock-conda/actions/workflows/tests.yml) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/conda-incubator/relock-conda/main.svg)](https://results.pre-commit.ci/latest/github/conda-incubator/relock-conda/main)
+[![tests](https://github.com/conda-incubator/relock-conda/actions/workflows/tests.yml/badge.svg)](https://github.com/conda-incubator/relock-conda/actions/workflows/tests.yml) [![test-command](https://github.com/conda-incubator/relock-conda/actions/workflows/test-command.yml/badge.svg)](https://github.com/conda-incubator/relock-conda/actions/workflows/test-command.yml) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/conda-incubator/relock-conda/main.svg)](https://results.pre-commit.ci/latest/github/conda-incubator/relock-conda/main)
 
 GitHub action to relock conda environments using conda-lock
 
