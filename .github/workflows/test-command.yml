@@ -52,9 +52,9 @@ jobs:
       - name: check for updates
         run: |
           gh pr checkout 112
-          if cmp -s conda-lock.yml ../conda-lock-backup.yml; then
-            echo "relock happened!"
-          else
+          diff conda-lock.yml ../conda-lock-backup.yml || :
+          diffval=$(diff conda-lock.yml ../conda-lock-backup.yml || :)
+          if [[ "${diffval}" == "" ]]; then
             echo "no relock happened!"
             exit 1
           fi
