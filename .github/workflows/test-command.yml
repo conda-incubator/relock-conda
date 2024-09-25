@@ -82,7 +82,7 @@ jobs:
             "s#conda-incubator/relock-conda@${branch}#conda-incubator/relock-conda@main#g" \
             .github/workflows/relock.yml
           git add .github/workflows/relock.yml
-          git commit -m "[ci skip] move relock code back to main"
+          git commit -m "[ci skip] move relock code back to main" --allow-empty
           git push
 
           gh pr checkout 112
