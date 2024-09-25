@@ -52,7 +52,11 @@ jobs:
       - name: check for updates
         run: |
           gh pr checkout 112
-          diff conda-lock.yml ../conda-lock-backup.yml && exit 1
+          diffval=$(diff relock.py relock.py)
+          if [[ "${diffval}" == "" ]]; then
+            echo "no relock happened!"
+            exit 1
+          fi
 
       - name: cleanup
         if: always()
