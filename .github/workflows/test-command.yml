@@ -1,0 +1,67 @@
+name: test-command
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: null
+
+concurrency:
+  group: test-command
+  cancel-in-progress: false
+
+jobs:
+  test-command:
+    name: test relock command
+    runs-on: "ubuntu-latest"
+    if: github.event.pull_request.title != 'relock w/ conda-lock'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: backup lock file
+        run:
+          gh pr checkout 112
+          cp conda-lock.yml ../conda-lock-backup.yml
+
+      - name: move relock code to current branch
+        run:
+          gh checkout main
+          sed -i \
+            's#conda-incubator/relock-conda@main#conda-incubator/relock-conda@pull/${{ github.event.number }}/head#' \
+            .github/workflows/relock.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/relock.yml
+          git commit -m "[ci skip] move relock code to current branch for testing"
+          git push
+
+      - name: trigger relock via comment
+        run: |
+          gh pr comment 112 --body "/relock-conda"
+
+      - name: wait for relock
+        run: |
+          sleep 60
+
+      - name: check for updates
+        run:
+          gh pr checkout 112
+          diff conda-lock.yml ../conda-lock-backup.yml
+
+      - name: cleanup
+        if: always()
+        run:
+          gh checkout main
+          sed -i \
+            's#conda-incubator/relock-conda@pull/${{ github.event.number }}/head#conda-incubator/relock-conda@main#' \
+            .github/workflows/relock.yml
+          git add .github/workflows/relock.yml
+          git commit -m "[ci skip] move relock code back to main"
+          git push
+
+          gh pr checkout 112
+          cp ../conda-lock-backup.yml conda-lock.yml
+          git add conda-lock.yml
+          git commit -m "[ci skip] restore old lock file"
+          git push
+
