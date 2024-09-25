@@ -110,20 +110,6 @@ runs:
         HAS_RELOCK_SLUG: ${{ startsWith(github.event.comment.body, '/relock-conda') }}
         COMMENT_IS_PR: ${{ github.event.issue.pull_request != null }}
 
-    - name: react to PR
-      if: >-
-        steps.check.outputs.skip != 'true'
-        && github.event_name == 'issue_comment'
-        && startsWith(github.event.comment.body, '/relock-conda')
-      shell: bash -leo pipefail {0}
-      run: |
-        python ${{ github.action_path }}/react.py \
-          --full-name "${{ github.repository }}" \
-          --pr-number "${{ github.event.issue.number }}" \
-          --comment-id "${{ github.event.comment.id }}"
-      env:
-        GH_TOKEN: ${{ inputs.github-token }}
-
     - name: setup conda-lock
       if: ${{ steps.check.outputs.skip != 'true' }}
       uses: mamba-org/setup-micromamba@f8b8a1e23a26f60a44c853292711bacfd3eac822 # v1
@@ -139,6 +125,20 @@ runs:
         condarc: |
           channels:
             - conda-forge
+
+    - name: react to PR
+      if: >-
+        steps.check.outputs.skip != 'true'
+        && github.event_name == 'issue_comment'
+        && startsWith(github.event.comment.body, '/relock-conda')
+      shell: bash -leo pipefail {0}
+      run: |
+        python ${{ github.action_path }}/react.py \
+          --full-name "${{ github.repository }}" \
+          --pr-number "${{ github.event.issue.number }}" \
+          --comment-id "${{ github.event.comment.id }}"
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
 
     - name: checkout PR if running on an issue
       if: >-
