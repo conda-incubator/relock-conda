@@ -34,7 +34,8 @@ jobs:
             ruamel.yaml \
             conda \
             conda-lock \
-            pytest
+            pytest \
+            pygithub
 
       - name: run tests
         shell: bash -leo pipefail {0}
