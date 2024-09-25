@@ -12,7 +12,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
         with:
-          ref: pull/${{ github.event.issue.id }}/head
+          ref: pull/${{ github.event.issue.number }}/head
 
       - name: setup
         run: |
