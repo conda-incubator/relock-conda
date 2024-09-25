@@ -78,27 +78,36 @@ runs:
       id: check
       shell: bash -leo pipefail {0}
       run: |
-        if [[ "${INPUT_ACTION}" != "pr" ]]; then
-            res="false"
-        else
-          prs=$(gh pr list \
-              --repo "$GITHUB_REPOSITORY" \
-              --head '${{ inputs.head-branch }}' \
-              --json title \
-              --jq 'map(select(.title == "relock w/ conda-lock")) | length')
-
-          if [[ ${prs} !=  "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
-              res="true"
+        if [[ "${EVENT_NAME}" == "issue_comment" ]]; then
+          if [[ "${HAS_RELOCK_SLUG:}" == "false" ]]; then
+            res="true"
           else
+            res="false"
+          fi
+        else
+          if [[ "${INPUT_ACTION}" != "pr" ]]; then
               res="false"
+          else
+            prs=$(gh pr list \
+                --repo "$GITHUB_REPOSITORY" \
+                --head '${{ inputs.head-branch }}' \
+                --json title \
+                --jq 'map(select(.title == "relock w/ conda-lock")) | length')
+
+            if [[ ${prs} !=  "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
+                res="true"
+            else
+                res="false"
+            fi
           fi
         fi
-
         echo "skip=${res}" >> "$GITHUB_OUTPUT"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
         SKIP_IF_PR_EXISTS: ${{ inputs.skip-if-pr-exists }}
         INPUT_ACTION: ${{ inputs.action }}
+        EVENT_NAME: ${{ github.event_name }}
+        HAS_RELOCK_SLUG: ${{ startsWith(github.event.comment.body, '/relock-conda') }}
 
     - name: setup conda-lock
       if: ${{ steps.check.outputs.skip != 'true' }}
