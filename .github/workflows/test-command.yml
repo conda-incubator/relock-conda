@@ -10,9 +10,6 @@ concurrency:
   group: test-command
   cancel-in-progress: false
 
-env:
-  GH_TOKEN: ${{ secrets.TEST_PAT }}
-
 jobs:
   test-command:
     name: test relock command
@@ -28,6 +25,8 @@ jobs:
         run: |
           gh pr checkout 112
           cp conda-lock.yml ../conda-lock-backup.yml
+        env:
+          GH_TOKEN: ${{ secrets.TEST_PAT }}
 
       - name: move relock code to current branch
         run: |
@@ -44,6 +43,8 @@ jobs:
       - name: trigger relock via comment
         run: |
           gh pr comment 112 --body "/relock-conda"
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: wait for relock
         run: |
@@ -52,12 +53,13 @@ jobs:
       - name: check for updates
         run: |
           gh pr checkout 112
-          diff conda-lock.yml ../conda-lock-backup.yml || :
           diffval=$(diff conda-lock.yml ../conda-lock-backup.yml || :)
           if [[ "${diffval}" == "" ]]; then
             echo "no relock happened!"
             exit 1
           fi
+        env:
+          GH_TOKEN: ${{ secrets.TEST_PAT }}
 
       - name: cleanup
         if: always()
@@ -75,4 +77,6 @@ jobs:
           git add conda-lock.yml
           git commit -m "[ci skip] restore old lock file" --allow-empty
           git push
+        env:
+          GH_TOKEN: ${{ secrets.TEST_PAT }}
 
