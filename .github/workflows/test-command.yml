@@ -25,7 +25,7 @@ jobs:
 
       - name: move relock code to current branch
         run:
-          gh checkout main
+          git checkout main
           sed -i \
             's#conda-incubator/relock-conda@main#conda-incubator/relock-conda@pull/${{ github.event.number }}/head#' \
             .github/workflows/relock.yml
