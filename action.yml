@@ -124,6 +124,8 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         gh pr checkout ${{ github.event.issue.number }}
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
 
     - name: relock
       id: relock

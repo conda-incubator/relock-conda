@@ -10,6 +10,9 @@ concurrency:
   group: test-command
   cancel-in-progress: false
 
+env:
+  GH_TOKEN: ${{ github.token }}
+
 jobs:
   test-command:
     name: test relock command
