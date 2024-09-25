@@ -30,15 +30,23 @@ jobs:
 
       - name: move relock code to current branch
         run: |
+          if [[ "${COMMENT_IS_PR}" == "false" ]]; then
+            branch=pull/${{ github.event.number }}/head
+          else
+            branch=main
+          fi
+          
           git checkout main
           sed -i \
-            's#conda-incubator/relock-conda@main#conda-incubator/relock-conda@pull/${{ github.event.number }}/head#g' \
+            "s#conda-incubator/relock-conda@main#conda-incubator/relock-conda@${branch}#g" \
             .github/workflows/relock.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .github/workflows/relock.yml
           git commit -m "[ci skip] move relock code to current branch for testing" --allow-empty
           git push
+        env:
+          COMMENT_IS_PR: ${{ github.event.issue.pull_request != null }}
 
       - name: trigger relock via comment
         run: |
@@ -64,9 +72,14 @@ jobs:
       - name: cleanup
         if: always()
         run: |
+          if [[ "${COMMENT_IS_PR}" == "false" ]]; then
+            branch=pull/${{ github.event.number }}/head
+          else
+            branch=main
+          fi
           git checkout main
           sed -i \
-            's#conda-incubator/relock-conda@pull/${{ github.event.number }}/head#conda-incubator/relock-conda@main#g' \
+            "s#conda-incubator/relock-conda@${branch}#conda-incubator/relock-conda@main#g" \
             .github/workflows/relock.yml
           git add .github/workflows/relock.yml
           git commit -m "[ci skip] move relock code back to main"
@@ -79,4 +92,5 @@ jobs:
           git push
         env:
           GH_TOKEN: ${{ secrets.TEST_PAT }}
+          COMMENT_IS_PR: ${{ github.event.issue.pull_request != null }}
 
