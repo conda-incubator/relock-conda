@@ -117,7 +117,7 @@ runs:
         && startsWith(github.event.comment.body, '/relock-conda')
       shell: bash -leo pipefail {0}
       run: |
-        python react.py \
+        python ${{ github.action_path }}/react.py \
           --full-name "${{ github.repository }}" \
           --pr-number "${{ github.event.issue.number }}" \
           --comment-id "${{ github.event.comment.id }}"
