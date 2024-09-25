@@ -30,7 +30,7 @@ jobs:
 
       - name: move relock code to current branch
         run: |
-          if [[ "${COMMENT_IS_PR}" == "true" ]]; then
+          if [[ "${IS_PR}" == "true" ]]; then
             branch=pull/${{ github.event.number }}/head
           else
             branch=main
@@ -46,7 +46,7 @@ jobs:
           git commit -m "[ci skip] move relock code to current branch for testing" --allow-empty
           git push
         env:
-          COMMENT_IS_PR: ${{ github.event.issue.pull_request != null }}
+          IS_PR: ${{ github.event_type == 'pull_request' }}
 
       - name: trigger relock via comment
         run: |
@@ -72,7 +72,7 @@ jobs:
       - name: cleanup
         if: always()
         run: |
-          if [[ "${COMMENT_IS_PR}" == "true" ]]; then
+          if [[ "${IS_PR}" == "true" ]]; then
             branch=pull/${{ github.event.number }}/head
           else
             branch=main
@@ -92,5 +92,5 @@ jobs:
           git push
         env:
           GH_TOKEN: ${{ secrets.TEST_PAT }}
-          COMMENT_IS_PR: ${{ github.event.issue.pull_request != null }}
+          IS_PR: ${{ github.event_type == 'pull_request' }}
 
