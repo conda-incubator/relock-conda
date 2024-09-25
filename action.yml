@@ -79,7 +79,7 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         if [[ "${EVENT_NAME}" == "issue_comment" ]]; then
-          if [[ "${HAS_RELOCK_SLUG}" == "false" ]]; then
+          if [[ "${HAS_RELOCK_SLUG}" == "false" || "${COMMENT_IS_PR}" == "" ]]; then
             res="true"
           else
             res="false"
@@ -108,6 +108,21 @@ runs:
         INPUT_ACTION: ${{ inputs.action }}
         EVENT_NAME: ${{ github.event_name }}
         HAS_RELOCK_SLUG: ${{ startsWith(github.event.comment.body, '/relock-conda') }}
+        COMMENT_IS_PR: ${{ github.event.issue.pull_request }}
+
+    - name: react to PR
+      if: >-
+        steps.check.outputs.skip != 'true'
+        && github.event_name == 'issue_comment'
+        && startsWith(github.event.comment.body, '/relock-conda')
+      shell: bash -leo pipefail {0}
+      run: |
+        python react.py \
+          --full-name "${{ github.repository }}" \
+          --pr-number "${{ github.event.issue.number }}" \
+          --comment-id "${{ github.event.comment.id }}"
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
 
     - name: setup conda-lock
       if: ${{ steps.check.outputs.skip != 'true' }}
