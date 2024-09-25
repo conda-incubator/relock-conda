@@ -19,12 +19,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: backup lock file
-        run:
+        run: |
           gh pr checkout 112
           cp conda-lock.yml ../conda-lock-backup.yml
 
       - name: move relock code to current branch
-        run:
+        run: |
           git checkout main
           sed -i \
             's#conda-incubator/relock-conda@main#conda-incubator/relock-conda@pull/${{ github.event.number }}/head#' \
@@ -44,13 +44,13 @@ jobs:
           sleep 60
 
       - name: check for updates
-        run:
+        run: |
           gh pr checkout 112
           diff conda-lock.yml ../conda-lock-backup.yml
 
       - name: cleanup
         if: always()
-        run:
+        run: |
           gh checkout main
           sed -i \
             's#conda-incubator/relock-conda@pull/${{ github.event.number }}/head#conda-incubator/relock-conda@main#' \
