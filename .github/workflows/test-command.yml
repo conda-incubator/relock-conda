@@ -52,12 +52,12 @@ jobs:
       - name: check for updates
         run: |
           gh pr checkout 112
-          diff conda-lock.yml ../conda-lock-backup.yml
+          diff conda-lock.yml ../conda-lock-backup.yml && exit 1
 
       - name: cleanup
         if: always()
         run: |
-          gh checkout main
+          git checkout main
           sed -i \
             's#conda-incubator/relock-conda@pull/${{ github.event.number }}/head#conda-incubator/relock-conda@main#g' \
             .github/workflows/relock.yml
