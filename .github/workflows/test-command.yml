@@ -32,15 +32,13 @@ jobs:
       - name: move relock code to current branch
         run: |
           git checkout main
-          cat .github/workflows/relock.yml
           sed -i \
             's#conda-incubator/relock-conda@main#conda-incubator/relock-conda@pull/${{ github.event.number }}/head#g' \
             .github/workflows/relock.yml
-          cat .github/workflows/relock.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .github/workflows/relock.yml
-          git commit -m "[ci skip] move relock code to current branch for testing"
+          git commit -m "[ci skip] move relock code to current branch for testing" --allow-empty
           git push
 
       - name: trigger relock via comment
@@ -61,7 +59,7 @@ jobs:
         run: |
           gh checkout main
           sed -i \
-            's#conda-incubator/relock-conda@pull/${{ github.event.number }}/head#conda-incubator/relock-conda@main#' \
+            's#conda-incubator/relock-conda@pull/${{ github.event.number }}/head#conda-incubator/relock-conda@main#g' \
             .github/workflows/relock.yml
           git add .github/workflows/relock.yml
           git commit -m "[ci skip] move relock code back to main"
@@ -70,6 +68,6 @@ jobs:
           gh pr checkout 112
           cp ../conda-lock-backup.yml conda-lock.yml
           git add conda-lock.yml
-          git commit -m "[ci skip] restore old lock file"
+          git commit -m "[ci skip] restore old lock file" --allow-empty
           git push
 
