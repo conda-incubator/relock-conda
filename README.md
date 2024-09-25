@@ -5,7 +5,7 @@ GitHub action to relock conda environments using conda-lock
 
 This action runs [conda-lock](https://github.com/conda/conda-lock) to relock a conda environment. Some features include
 
-- responding to comments on PRs to relock the environment
+- responding to comments on PRs to relock the environment (comment with `/relock-conda` to trigger)
 - running on a schedule to relock the environment
 - customization of which package version updates trigger a relock
 
