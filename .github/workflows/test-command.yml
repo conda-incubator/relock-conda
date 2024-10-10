@@ -35,7 +35,7 @@ jobs:
           else
             branch=main
           fi
-          
+
           git checkout main
           sed -i \
             "s#conda-incubator/relock-conda@main#conda-incubator/relock-conda@${branch}#g" \
@@ -46,7 +46,7 @@ jobs:
           git commit -m "[ci skip] move relock code to current branch for testing" --allow-empty
           git push
         env:
-          IS_PR: ${{ github.event_type == 'pull_request' }}
+          IS_PR: ${{ github.event_name == 'pull_request' }}
 
       - name: trigger relock via comment
         run: |
@@ -92,5 +92,5 @@ jobs:
           git push
         env:
           GH_TOKEN: ${{ secrets.TEST_PAT }}
-          IS_PR: ${{ github.event_type == 'pull_request' }}
+          IS_PR: ${{ github.event_name == 'pull_request' }}
 
