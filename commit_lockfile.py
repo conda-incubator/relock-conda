@@ -33,6 +33,11 @@ def main(
 ):
     repo_owner, repo_name = _get_repo_owner_and_name()
     branch = _get_current_branch()
+    print(
+        f"Updating '{lock_file}' in '{repo_owner}/{repo_name}' on branch '{branch}'...",
+        flush=True,
+    )
+
     gh = github.Github(auth=github.Auth.Token(os.environ["GH_TOKEN"]))
     repo = gh.get_repo(f"{repo_owner}/{repo_name}")
 
@@ -48,7 +53,7 @@ def main(
         branch=branch,
     )
     print(
-        f"Updated {lock_file} in {repo_owner}/{repo_name} on branch {branch} w/ commit {res['commit'].sha}",
+        f"Updated w/ commit {res['commit'].sha}",
         flush=True,
     )
 
