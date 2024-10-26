@@ -33,7 +33,7 @@ def main(
 ):
     repo_owner, repo_name = _get_repo_owner_and_name()
     branch = _get_current_branch()
-    gh = github.Github(auth=github.Auth.Token(os.eviron["GH_TOKEN"]))
+    gh = github.Github(auth=github.Auth.Token(os.environ["GH_TOKEN"]))
     repo = gh.get_repo(f"{repo_owner}/{repo_name}")
 
     contents = repo.get_contents(lock_file, ref=branch)
