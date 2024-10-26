@@ -6,6 +6,7 @@ import github
 
 
 def _get_repo_owner_and_name():
+    subprocess.run(["git", "remote", "-v"])
     res = subprocess.run(
         ["git", "remote", "get-url", "--push", "origin"],
         shell=True,
