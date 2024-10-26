@@ -78,6 +78,7 @@ runs:
       id: check
       shell: bash -leo pipefail {0}
       run: |
+        # skip if PR already exists
         if [[ "${EVENT_NAME}" == "issue_comment" ]]; then
           if [[ "${HAS_RELOCK_SLUG}" == "false" || "${COMMENT_IS_PR}" == "false" ]]; then
             res="true"
@@ -117,6 +118,7 @@ runs:
         && startsWith(github.event.comment.body, '/relock-conda')
       shell: bash -leo pipefail {0}
       run: |
+        # react to issue comment
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
@@ -149,6 +151,7 @@ runs:
         && startsWith(github.event.comment.body, '/relock-conda')
       shell: bash -leo pipefail {0}
       run: |
+        # checkout PR if running on an issue
         gh pr checkout ${{ github.event.issue.number }}
       env:
         GH_TOKEN: ${{ inputs.github-token }}
@@ -158,6 +161,7 @@ runs:
       if: ${{ steps.check.outputs.skip != 'true' }}
       shell: bash -leo pipefail {0}
       run: |
+        # relock
         echo "::group::relock"
         python ${{ github.action_path }}/relock.py \
           --environment-file='${{ inputs.environment-file }}' \
@@ -187,11 +191,11 @@ runs:
         )
       shell: bash -leo pipefail {0}
       run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add ${{ inputs.lock-file }}
-        git commit -m "relock w/ conda-lock"
-        git push
+        # commit changes
+        python ${{ github.action_path }}/commit_lockfile.py \
+          --lock-file='${{ inputs.lock-file }}'
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
 
     - name: open PR
       id: pr
@@ -224,15 +228,18 @@ runs:
         && inputs.action == 'pr'
         && github.event_name != 'issue_comment'
       shell: bash -leo pipefail {0}
-      run: gh pr merge --merge --auto "${{ steps.pr.outputs.pull-request-number }}"
+      run: |
+        # automerge
+        gh pr merge --merge --auto "${{ steps.pr.outputs.pull-request-number }}"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
-    - name: set output
+    - name: set outputs
       id: set-output
       if: always()
       shell: bash -leo pipefail {0}
       run: |
+        # set outputs
         res=""
 
         # if we skipped, we did not relock
