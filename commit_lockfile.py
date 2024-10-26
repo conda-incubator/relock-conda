@@ -13,7 +13,7 @@ def _get_repo_owner_and_name():
         text=True,
     )
     if res.returncode != 0:
-        raise RuntimeError("Could not get repo name")
+        raise RuntimeError("Could not get repo name:\n" + res.stderr)
     parts = res.stdout.strip().split("/")
     return parts[-2], parts[-1][: -len(".git")]
 
@@ -26,7 +26,7 @@ def _get_current_branch():
         text=True,
     )
     if res.returncode != 0:
-        raise RuntimeError("Could not get current branch")
+        raise RuntimeError("Could not get current branch:\n" + res.stderr)
     return res.stdout.strip()
 
 
