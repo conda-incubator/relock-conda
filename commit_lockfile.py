@@ -6,17 +6,22 @@ import github
 
 
 def _get_repo_owner_and_name():
-    subprocess.run(["git", "remote", "-v"])
-    subprocess.run(["git", "remote", "get-url", "--push", "origin"])
+    # for w/e reason, this sometimes returns a non-zero exit code
+    # even if it works
     res = subprocess.run(
         ["git", "remote", "get-url", "--push", "origin"],
         shell=True,
-        check=True,
         stdout=subprocess.PIPE,
         text=True,
     )
-    parts = res.stdout.strip().split("/")
-    return parts[-2], parts[-1][: -len(".git")]
+    output = res.stdout.strip()
+    if (
+        output.startswith("https://github.com") or output.startswith("git@github.com")
+    ) and output.endswith(".git"):
+        parts = res.stdout.strip().split("/")
+        return parts[-2], parts[-1][: -len(".git")]
+    else:
+        raise RuntimeError("Could not get repo owner and name:\n" + output)
 
 
 def _get_current_branch():
