@@ -9,11 +9,10 @@ def _get_repo_owner_and_name():
     res = subprocess.run(
         ["git", "remote", "get-url", "--push", "origin"],
         shell=True,
-        capture_output=True,
+        check=True,
+        stdout=subprocess.PIPE,
         text=True,
     )
-    if res.returncode != 0:
-        raise RuntimeError("Could not get repo name:\n" + res.stderr)
     parts = res.stdout.strip().split("/")
     return parts[-2], parts[-1][: -len(".git")]
 
@@ -22,11 +21,10 @@ def _get_current_branch():
     res = subprocess.run(
         ["git", "rev-parse", "--abbrev-ref", "HEAD"],
         shell=True,
-        capture_output=True,
+        check=True,
+        stdout=subprocess.PIPE,
         text=True,
     )
-    if res.returncode != 0:
-        raise RuntimeError("Could not get current branch:\n" + res.stderr)
     return res.stdout.strip()
 
 
