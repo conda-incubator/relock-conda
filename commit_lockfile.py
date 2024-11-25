@@ -40,7 +40,7 @@ def _get_owner_repo_branch():
             "--json",
             "headRepository",
             "--json",
-            "headRepositoryOwner"
+            "headRepositoryOwner",
         ],
         text=True,
         check=True,
