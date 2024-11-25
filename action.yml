@@ -193,7 +193,8 @@ runs:
       run: |
         # commit changes
         python ${{ github.action_path }}/commit_lockfile.py \
-          --lock-file='${{ inputs.lock-file }}'
+          --lock-file='${{ inputs.lock-file }}' \
+          --event-name='${{ github.event_name }}'
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
