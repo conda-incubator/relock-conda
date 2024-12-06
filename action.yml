@@ -152,7 +152,7 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         # checkout PR if running on an issue
-        gh pr checkout ${{ github.event.issue.number }}
+        gh pr checkout '${{ github.event.issue.number }}'
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
@@ -231,7 +231,7 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         # automerge
-        gh pr merge --merge --auto "${{ steps.pr.outputs.pull-request-number }}"
+        gh pr merge --merge --auto '${{ steps.pr.outputs.pull-request-number }}'
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
