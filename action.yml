@@ -130,7 +130,7 @@ runs:
 
     - name: setup conda-lock
       if: ${{ steps.check.outputs.skip != 'true' }}
-      uses: mamba-org/setup-micromamba@06375d89d211a1232ef63355742e9e2e564bc7f7 # v1
+      uses: mamba-org/setup-micromamba@068f1ab4b37ed9b3d9f73da7db90a0cda0a48d29 # v1
       with:
         environment-name: relock-env
         create-args: >-
@@ -205,7 +205,7 @@ runs:
         && steps.relock.outputs.env_relocked == 'true'
         && inputs.action == 'pr'
         && github.event_name != 'issue_comment'
-      uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f
+      uses: peter-evans/create-pull-request@67ccf781d68cd99b580ae25a5c18a1cc84ffff1f
       with:
         commit-message: relock w/ conda-lock
         title: relock w/ conda-lock
