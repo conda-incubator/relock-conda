@@ -192,8 +192,13 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         if [[ '${{ github.event_name }}' == 'issue_comment' ]]; then
-          git config user.email "conda@relock.conda"
-          git config user.name "conda-relock workflow"
+          login=$(gh api user --jq '.name')
+          email=$(gh api user --jq '.email')
+          if [[ "${email}" == "" || "${email}" == "null" ]]; then
+            email=${login}@users.noreply.github.com
+          fi
+          git config user.email ${email}
+          git config user.name ${login}
           branch=$(gh pr view --json headRefName --jq '.headRefName')
           repo=$(gh pr view --json headRepository --jq '.headRepository.name')
           owner=$(gh pr view --json headRepositoryOwner --jq '.headRepositoryOwner.login')
