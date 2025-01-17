@@ -191,6 +191,7 @@ runs:
         )
       shell: bash -leo pipefail {0}
       run: |
+        echo ${GH_TOKEN} | gh auth login --with-token
         branch=$(gh pr view --json headRefName --jq '.headRefName')
         repo=$(gh pr view --json headRepository --jq '.headRepository.name')
         owner=$(gh pr view --json headRepositoryOwner --jq '.headRepositoryOwner.login')
