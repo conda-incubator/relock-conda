@@ -197,7 +197,7 @@ runs:
             login='relock-conda'
           fi
           email=$(gh api user --jq '.email')
-          if [[ "${email}" == *"status\":\"4"* ]];
+          if [[ "${email}" == *"status\":\"4"* ]]; then
             email=''
           fi
           if [[ "${email}" == "" || "${email}" == "null" ]]; then
