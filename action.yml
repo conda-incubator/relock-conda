@@ -191,17 +191,20 @@ runs:
         )
       shell: bash -leo pipefail {0}
       run: |
-        echo ${GH_TOKEN} | gh auth login --with-token
-        branch=$(gh pr view --json headRefName --jq '.headRefName')
-        repo=$(gh pr view --json headRepository --jq '.headRepository.name')
-        owner=$(gh pr view --json headRepositoryOwner --jq '.headRepositoryOwner.login')
+        if [[ '${{ github.event_name }}' == 'issue_comment' ]]; then
+          git config user.email "conda@relock.conda"
+          git config user.name "conda-relock workflow"
+          branch=$(gh pr view --json headRefName --jq '.headRefName')
+          repo=$(gh pr view --json headRepository --jq '.headRepository.name')
+          owner=$(gh pr view --json headRepositoryOwner --jq '.headRepositoryOwner.login')
+        else
+          branch=$(git rev-parse --abbrev-ref HEAD)
+          repo=$(basename -s .git `git config --get remote.origin.url`)
+          owner=$(dirname `git config --get remote.origin.url` | rev | cut -d'/' -f1 | rev)
+        fi
         git add '${{ inputs.lock-file }}'
         git commit -m 'relock w/ conda-lock'
         git push https://x-access-token:${GH_TOKEN}@github.com/${owner}/${repo}.git ${branch}:${branch}
-        # commit changes
-        # python ${{ github.action_path }}/commit_lockfile.py \
-        #   --lock-file='${{ inputs.lock-file }}' \
-        #   --event-name='${{ github.event_name }}'
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
