@@ -152,7 +152,7 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         # checkout PR if running on an issue
-        gh pr checkout '${{ github.event.issue.number }}'
+        gh pr checkout --repo "$GITHUB_REPOSITORY" '${{ github.event.issue.number }}'
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
@@ -191,10 +191,16 @@ runs:
         )
       shell: bash -leo pipefail {0}
       run: |
+        branch=$(gh pr view --json headRefName --jq '.headRefName')
+        repo=$(gh pr view --json headRepository --jq '.headRepository.name')
+        owner=$(gh pr view --json headRepositoryOwner --jq '.headRepositoryOwner.login')
+        git add '${{ inputs.lock-file }}'
+        git commit -m 'relock w/ conda-lock'
+        git push https://x-access-token:${GH_TOKEN}@github.com/${owner}/${repo}.git ${branch}:${branch}
         # commit changes
-        python ${{ github.action_path }}/commit_lockfile.py \
-          --lock-file='${{ inputs.lock-file }}' \
-          --event-name='${{ github.event_name }}'
+        # python ${{ github.action_path }}/commit_lockfile.py \
+        #   --lock-file='${{ inputs.lock-file }}' \
+        #   --event-name='${{ github.event_name }}'
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
