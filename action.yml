@@ -197,8 +197,10 @@ runs:
           if [[ "${email}" == "" || "${email}" == "null" ]]; then
             email=${login}@users.noreply.github.com
           fi
-          git config set user.email ${email}
-          git config set user.name ${login}
+          echo "login: ${login}"
+          echo "email: ${email}"
+          git config set user.email "${email}"
+          git config set user.name "${login}"
           branch=$(gh pr view --json headRefName --jq '.headRefName')
           repo=$(gh pr view --json headRepository --jq '.headRepository.name')
           owner=$(gh pr view --json headRepositoryOwner --jq '.headRepositoryOwner.login')
