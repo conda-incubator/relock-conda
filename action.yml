@@ -192,8 +192,8 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         if [[ '${{ github.event_name }}' == 'issue_comment' ]]; then
-          login=$(gh api user --jq '.name' || 'relock-conda')
-          email=$(gh api user --jq '.email' || '')
+          login=$(gh api user --jq '.name' || echo 'relock-conda')
+          email=$(gh api user --jq '.email' || echo '')
           if [[ "${email}" == "" || "${email}" == "null" ]]; then
             email=${login}@users.noreply.github.com
           fi
