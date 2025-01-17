@@ -152,7 +152,7 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         # checkout PR if running on an issue
-        gh pr checkout '${{ github.event.issue.number }}'
+        gh pr checkout --repo "$GITHUB_REPOSITORY" '${{ github.event.issue.number }}'
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
@@ -191,10 +191,33 @@ runs:
         )
       shell: bash -leo pipefail {0}
       run: |
-        # commit changes
-        python ${{ github.action_path }}/commit_lockfile.py \
-          --lock-file='${{ inputs.lock-file }}' \
-          --event-name='${{ github.event_name }}'
+        if [[ '${{ github.event_name }}' == 'issue_comment' ]]; then
+          login=$(gh api user --jq '.name' || echo '')
+          if [[ "${login}" == *"status\":\"4"* ]]; then
+            login='relock-conda'
+          fi
+          email=$(gh api user --jq '.email' || echo '')
+          if [[ "${email}" == *"status\":\"4"* ]]; then
+            email=''
+          fi
+          if [[ "${email}" == "" || "${email}" == "null" ]]; then
+            email=${login}@users.noreply.github.com
+          fi
+          echo "login: ${login}"
+          echo "email: ${email}"
+          git config set user.email "${email}"
+          git config set user.name "${login}"
+          branch=$(gh pr view --json headRefName --jq '.headRefName')
+          repo=$(gh pr view --json headRepository --jq '.headRepository.name')
+          owner=$(gh pr view --json headRepositoryOwner --jq '.headRepositoryOwner.login')
+        else
+          branch=$(git rev-parse --abbrev-ref HEAD)
+          repo=$(basename -s .git `git config --get remote.origin.url`)
+          owner=$(dirname `git config --get remote.origin.url` | rev | cut -d'/' -f1 | rev)
+        fi
+        git add '${{ inputs.lock-file }}'
+        git commit -m 'relock w/ conda-lock'
+        git push https://x-access-token:${GH_TOKEN}@github.com/${owner}/${repo}.git ${branch}:${branch}
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
