@@ -192,11 +192,11 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         if [[ '${{ github.event_name }}' == 'issue_comment' ]]; then
-          login=$(gh api user --jq '.name')
+          login=$(gh api user --jq '.name' || echo '')
           if [[ "${login}" == *"status\":\"4"* ]]; then
             login='relock-conda'
           fi
-          email=$(gh api user --jq '.email')
+          email=$(gh api user --jq '.email' || echo '')
           if [[ "${email}" == *"status\":\"4"* ]]; then
             email=''
           fi
