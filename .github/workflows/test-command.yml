@@ -28,6 +28,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.TEST_PAT }}
 
+      - name: make uid
+        id: uid
+        run: |
+          uid=$(od -x /dev/urandom | head -1 | awk '{OFS="-"; print $2$3,$4,$5,$6,$7$8$9}')
+          echo "uid=${uid}" > "$GITHUB_OUTPUT"
+
       - name: move relock code to current branch
         run: |
           if [[ "${IS_PR}" == "true" ]]; then
@@ -40,6 +46,9 @@ jobs:
           sed -i \
             "s#conda-incubator/relock-conda@main#conda-incubator/relock-conda@${branch}#g" \
             .github/workflows/relock.yml
+          sed -i \
+            "s#@@GIT_USER_NAME@@#${UID}#g" \
+            .github/workflows/relock.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .github/workflows/relock.yml
@@ -47,6 +56,7 @@ jobs:
           git push
         env:
           IS_PR: ${{ github.event_name == 'pull_request' }}
+          UID: ${{ steps.uid.outputs.uid }}
 
       - name: trigger relock via comment
         run: |
@@ -69,6 +79,28 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.TEST_PAT }}
 
+      - name: ensure git committer is correct
+        run: |
+          loginfo=$(git log --name-status HEAD^..HEAD)
+          echo "${loginfo}"
+          if [[ "${loginfo}" != *"Author: ${UID}"* ]]; then
+            echo "git committer is not correct!"
+            exit 1
+          fi
+        env:
+          UID: ${{ steps.uid.outputs.uid }}
+
+      - name: ensure a comment was made
+        run: |
+          latest_login=$(gh pr view 112 --json comments --jq '.comments[-1].author.login')
+          echo "latest_login: ${latest_login}"
+          if [[ "${latest_login}" != "github-actions" ]]; then
+            echo "no comment was made!"
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.TEST_PAT }}
+
       - name: cleanup
         if: always()
         run: |
@@ -81,6 +113,11 @@ jobs:
           sed -i \
             "s#conda-incubator/relock-conda@${branch}#conda-incubator/relock-conda@main#g" \
             .github/workflows/relock.yml
+
+          sed -i \
+            "s#${UID}#@@GIT_USER_NAME@@#g" \
+            .github/workflows/relock.yml
+
           git add .github/workflows/relock.yml
           git commit -m "[ci skip] move relock code back to main" --allow-empty
           git push
@@ -93,4 +130,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.TEST_PAT }}
           IS_PR: ${{ github.event_name == 'pull_request' }}
+          UID: ${{ steps.uid.outputs.uid }}
 

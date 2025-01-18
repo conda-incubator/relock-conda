@@ -72,6 +72,10 @@ jobs:
 
           # whether to open the PR as a draft
           draft: false  # default
+
+          # git commit info
+          git-user-name: # default of '' infers from the API or defaults to github.actor if API fails
+          git-user-email: # default of '' uses ${git-user-name}@users.noreply.github.com
 ```
 
 See the [action.yml](action.yml) for details on possible inputs and options.
