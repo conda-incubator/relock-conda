@@ -34,7 +34,7 @@ inputs:
   action:
     description: >
       the action to take if the lock file is updated: `pr` will make a PR; `file` will leave the updated lock file
-      in the current working directory
+      in the current working directory; `commit` will commit the updated lock file and push the changes
     required: true
     default: 'pr'
   automerge:
@@ -58,6 +58,20 @@ inputs:
     description: 'whether to open the PR as a draft'
     required: true
     default: false
+  git-user-name:
+    description: >
+      the name to use for git commits; the default of '' attempts to infer the name
+      from the login associated with the GitHub token via the API. if this fails,
+      we use the value `github.actor` from the context.
+    required: false
+    default: ''
+  git-user-email:
+    description: >
+      the email to use for git commits; the default of '' attempts to infer the email
+      from the login associated with the GitHub token via the API. if this fails,
+      we use '${git_user_name}@users.noreply.github.com'.
+    required: false
+    default: ''
 
 outputs:
   pull-request-number:
@@ -191,14 +205,19 @@ runs:
         )
       shell: bash -leo pipefail {0}
       run: |
-        if [[ '${{ github.event_name }}' == 'issue_comment' ]]; then
+        if [[ '${{ inputs.git_user_name }}' == '' ]]; then
           login=$(gh api user --jq '.name' || echo '')
           if [[ "${login}" == *"status\":\"4"* ]]; then
             login=''
           fi
           if [[ "${login}" == "" || "${login}" == "null" ]]; then
-            login='relock-conda'
+            login='${{ github.actor }}'
           fi
+        else
+          login='${{ inputs.git_user_name }}'
+        fi
+
+        if [[ '${{ inputs.git_user_email }}' == '' ]]; then
           email=$(gh api user --jq '.email' || echo '')
           if [[ "${email}" == *"status\":\"4"* ]]; then
             email=''
@@ -206,10 +225,17 @@ runs:
           if [[ "${email}" == "" || "${email}" == "null" ]]; then
             email=${login}@users.noreply.github.com
           fi
-          echo "login: ${login}"
-          echo "email: ${email}"
-          git config set user.email "${email}"
-          git config set user.name "${login}"
+        else
+          email='${{ inputs.git_user_email }}'
+        fi
+
+        echo "login: ${login}"
+        echo "email: ${email}"
+
+        git config set user.email ${email}
+        git config set user.name ${login}
+
+        if [[ '${{ github.event_name }}' == 'issue_comment' ]]; then
           branch=$(gh pr view --json headRefName --jq '.headRefName')
           repo=$(gh pr view --json headRepository --jq '.headRepository.name')
           owner=$(gh pr view --json headRepositoryOwner --jq '.headRepositoryOwner.login')
@@ -245,6 +271,25 @@ runs:
         labels: dependencies
         base: ${{ inputs.base-branch }}
         draft: ${{ inputs.draft }}
+
+    - name: comment on issue
+      if: >-
+        steps.check.outputs.skip != 'true'
+        && steps.relock.outputs.env_relocked == 'true'
+        && (
+          inputs.action == 'commit'
+          || (
+            github.event_name == 'issue_comment'
+            && startsWith(github.event.comment.body, '/relock-conda')
+          )
+        )
+      shell: bash -leo pipefail {0}
+      run: |
+        # comment on issue
+        gh pr comment --repo "$GITHUB_REPOSITORY" --body "I've relocked the dependencies with conda-lock!
+
+
+          ${{ steps.relock.outputs.summary }}" '${{ github.event.issue.number }}'
 
     - name: automerge
       if: >-
