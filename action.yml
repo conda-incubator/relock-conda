@@ -290,6 +290,8 @@ runs:
 
 
           ${{ steps.relock.outputs.summary }}" '${{ github.event.issue.number }}'
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
 
     - name: automerge
       if: >-
