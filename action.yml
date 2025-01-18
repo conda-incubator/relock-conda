@@ -69,7 +69,7 @@ inputs:
     description: >
       the email to use for git commits; the default of '' attempts to infer the email
       from the login associated with the GitHub token via the API. if this fails,
-      we use '${git_user_name}@users.noreply.github.com'.
+      we use '${git-user-name}@users.noreply.github.com'.
     required: false
     default: ''
 
@@ -205,7 +205,7 @@ runs:
         )
       shell: bash -leo pipefail {0}
       run: |
-        if [[ '${{ inputs.git_user_name }}' == '' ]]; then
+        if [[ '${{ inputs.git-user-name }}' == '' ]]; then
           login=$(gh api user --jq '.name' || echo '')
           if [[ "${login}" == *"status\":\"4"* ]]; then
             login=''
@@ -214,10 +214,10 @@ runs:
             login='${{ github.actor }}'
           fi
         else
-          login='${{ inputs.git_user_name }}'
+          login='${{ inputs.git-user-name }}'
         fi
 
-        if [[ '${{ inputs.git_user_email }}' == '' ]]; then
+        if [[ '${{ inputs.git-user-email }}' == '' ]]; then
           email=$(gh api user --jq '.email' || echo '')
           if [[ "${email}" == *"status\":\"4"* ]]; then
             email=''
@@ -226,7 +226,7 @@ runs:
             email=${login}@users.noreply.github.com
           fi
         else
-          email='${{ inputs.git_user_email }}'
+          email='${{ inputs.git-user-email }}'
         fi
 
         echo "login: ${login}"
