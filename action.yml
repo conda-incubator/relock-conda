@@ -194,6 +194,9 @@ runs:
         if [[ '${{ github.event_name }}' == 'issue_comment' ]]; then
           login=$(gh api user --jq '.name' || echo '')
           if [[ "${login}" == *"status\":\"4"* ]]; then
+            login=''
+          fi
+          if [[ "${login}" == "" || "${login}" == "null" ]]; then
             login='relock-conda'
           fi
           email=$(gh api user --jq '.email' || echo '')
