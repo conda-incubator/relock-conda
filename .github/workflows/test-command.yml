@@ -79,12 +79,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.TEST_PAT }}
 
-      - name: ensure git commiter is correct
+      - name: ensure git committer is correct
         run: |
           loginfo=$(git log --name-status HEAD^..HEAD)
           echo "${loginfo}"
           if [[ "${loginfo}" != *"Author: ${UID}"* ]]; then
-            echo "git commiter is not correct!"
+            echo "git committer is not correct!"
             exit 1
           fi
         env:
