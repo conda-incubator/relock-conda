@@ -82,6 +82,7 @@ jobs:
       - name: ensure a comment was made
         run: |
           latest_login=$(gh pr view 112 --json comments --jq '.comments[-1].author.login')
+          echo "latest_login: ${latest_login}"
           if [[ "${latest_login}" != *"${UID}"* ]]; then
             echo "no comment was made!"
             exit 1

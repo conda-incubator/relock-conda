@@ -74,7 +74,7 @@ jobs:
           draft: false  # default
 
           # git commit info
-          git-user-name: # default of '' infers from the API, github.actor, or falls back to 'relock-conda'
+          git-user-name: # default of '' infers from the API or defaults to github.actor if API fails
           git-user-email: # default of '' uses ${git-user-name}@users.noreply.github.com
 ```
 
