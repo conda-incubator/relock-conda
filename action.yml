@@ -142,6 +142,53 @@ runs:
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
+    - name: compute git user information
+      id: git-user
+      if: ${{ steps.check.outputs.skip != 'true' }}
+      shell: bash -leo pipefail {0}
+      run: |
+        if [[ '${{ inputs.git-user-name }}' == '' ]]; then
+          login=$(gh api user --jq '.login' || echo '')
+          if [[ "${login}" == *"status\":\"4"* ]]; then
+            login=''
+          fi
+          if [[ "${login}" == "" || "${login}" == "null" ]]; then
+            login='${{ github.actor }}'
+          fi
+
+          user_id=$(gh api user --jq '.id' || echo '')
+          if [[ "${user_id}" == *"status\":\"4"* ]]; then
+            user_id=''
+          fi
+          if [[ "${user_id}" == "" || "${user_id}" == "null" ]]; then
+            user_id='${{ github.actor_id }}'
+          fi
+          user_id="${user_id}+"
+        else
+          login='${{ inputs.git-user-name }}'
+          user_id=''
+        fi
+
+        if [[ '${{ inputs.git-user-email }}' == '' ]]; then
+          email=$(gh api user --jq '.email' || echo '')
+          if [[ "${email}" == *"status\":\"4"* ]]; then
+            email=''
+          fi
+          if [[ "${email}" == "" || "${email}" == "null" ]]; then
+            email=${user_id}${login}@users.noreply.github.com
+          fi
+        else
+          email='${{ inputs.git-user-email }}'
+        fi
+
+        echo "login: ${login}"
+        echo "email: ${email}"
+
+        echo "user-name=${login}" >> "$GITHUB_OUTPUT"
+        echo "user-email=${email}" >> "$GITHUB_OUTPUT"
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+
     - name: setup conda-lock
       if: ${{ steps.check.outputs.skip != 'true' }}
       uses: mamba-org/setup-micromamba@068f1ab4b37ed9b3d9f73da7db90a0cda0a48d29 # v1
@@ -205,35 +252,8 @@ runs:
         )
       shell: bash -leo pipefail {0}
       run: |
-        if [[ '${{ inputs.git-user-name }}' == '' ]]; then
-          login=$(gh api user --jq '.name' || echo '')
-          if [[ "${login}" == *"status\":\"4"* ]]; then
-            login=''
-          fi
-          if [[ "${login}" == "" || "${login}" == "null" ]]; then
-            login='${{ github.actor }}'
-          fi
-        else
-          login='${{ inputs.git-user-name }}'
-        fi
-
-        if [[ '${{ inputs.git-user-email }}' == '' ]]; then
-          email=$(gh api user --jq '.email' || echo '')
-          if [[ "${email}" == *"status\":\"4"* ]]; then
-            email=''
-          fi
-          if [[ "${email}" == "" || "${email}" == "null" ]]; then
-            email=${login}@users.noreply.github.com
-          fi
-        else
-          email='${{ inputs.git-user-email }}'
-        fi
-
-        echo "login: ${login}"
-        echo "email: ${email}"
-
-        git config set user.email ${email}
-        git config set user.name ${login}
+        git config set user.email '${{ steps.git-user.outputs.user-email }}'
+        git config set user.name '${{ steps.git-user.outputs.user-name }}'
 
         if [[ '${{ github.event_name }}' == 'issue_comment' ]]; then
           branch=$(gh pr view --json headRefName --jq '.headRefName')
@@ -271,6 +291,8 @@ runs:
         labels: dependencies
         base: ${{ inputs.base-branch }}
         draft: ${{ inputs.draft }}
+        committer: '${{ steps.git-user.outputs.user-name }} <${{ steps.git-user.outputs.user-email }}>'
+        author: '${{ steps.git-user.outputs.user-name }} <${{ steps.git-user.outputs.user-email }}>'
 
     - name: comment on issue
       if: >-
