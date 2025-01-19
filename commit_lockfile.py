@@ -119,10 +119,10 @@ def main(
     else:
         repo_owner, repo_name = _get_repo_owner_and_name()
         branch = _get_current_branch()
-        print(
-            f"Updating '{lock_file}' in '{repo_owner}/{repo_name}' on branch '{branch}'...",
-            flush=True,
-        )
+    print(
+        f"Updating '{lock_file}' in '{repo_owner}/{repo_name}' on branch '{branch}'...",
+        flush=True,
+    )
 
     try:
         _commit_via_api(lock_file, repo_owner, repo_name, branch)
