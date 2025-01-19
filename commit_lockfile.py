@@ -82,7 +82,7 @@ def _commit_via_cli(git_user_name, git_user_email, lock_file, owner, repo, branc
     )
 
 
-def _commit_via_api(lock_file, owner, repo, branch):
+def _commit_via_api(git_user_name, git_user_email, lock_file, owner, repo, branch):
     gh = github.Github(auth=github.Auth.Token(os.environ["GH_TOKEN"]))
     repo = gh.get_repo(f"{owner}/{repo}")
 
@@ -96,6 +96,8 @@ def _commit_via_api(lock_file, owner, repo, branch):
         new_lockfile_content,
         contents.sha,
         branch=branch,
+        author=github.InputGitAuthor(git_user_name, git_user_email),
+        committer=github.InputGitAuthor(git_user_name, git_user_email),
     )
     print(
         f"Updated w/ commit {res['commit'].sha}",
@@ -125,7 +127,9 @@ def main(
     )
 
     try:
-        _commit_via_api(lock_file, repo_owner, repo_name, branch)
+        _commit_via_api(
+            git_user_name, git_user_email, lock_file, repo_owner, repo_name, branch
+        )
     except Exception:
         print("Failed to commit via API, trying via CLI...", flush=True)
         _commit_via_cli(
