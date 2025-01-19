@@ -144,9 +144,7 @@ runs:
 
     - name: compute git user information
       id: git-user
-      if: >-
-        steps.check.outputs.skip != 'true'
-        && steps.relock.outputs.env_relocked == 'true'
+      if: ${{ steps.check.outputs.skip != 'true' }}
       shell: bash -leo pipefail {0}
       run: |
         if [[ '${{ inputs.git-user-name }}' == '' ]]; then
