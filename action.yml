@@ -376,9 +376,9 @@ runs:
         if [[ '${{ steps.relock.outcome }}' == 'success' ]]; then
           state='success'
           if [[ '${{ steps.relock.outputs.env_relocked }}' == 'true' ]]; then
-            msg="Relocked the conda environment."
+            msg="Relocked the conda environment successfully."
           else
-            msg="The conda environment is already up-to-date."
+            msg="The conda environment was already up-to-date."
           fi
         else
           state='failure'
