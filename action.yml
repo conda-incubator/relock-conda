@@ -153,7 +153,7 @@ runs:
           /repos/${{ github.repository }}/statuses/${sha} \
           -f "state=pending" \
           -f "target_url=${url}" \
-          -f "description=Relocking conda environment..." \
+          -f "description=Relocking the conda environment..." \
           -f "context=relock-conda"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
@@ -371,10 +371,10 @@ runs:
         # set commit status
         if [[ '${{ steps.relock.outcome }}' == 'success' ]]; then
           state='success'
-          msg="Relocking conda environment succeeded."
+          msg="Relocking the conda environment succeeded."
         else
           state='failure'
-          msg="Relocking conda environment failed."
+          msg="Relocking the conda environment failed."
         fi
 
         sha=$(git rev-parse --verify HEAD)
