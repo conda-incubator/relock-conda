@@ -375,7 +375,11 @@ runs:
         # set commit status
         if [[ '${{ steps.relock.outcome }}' == 'success' ]]; then
           state='success'
-          msg="Relocking the conda environment succeeded."
+          if [[ '${{ steps.relock.outputs.env_relocked }}' == 'true' ]]; then
+            msg="Relocked the conda environment."
+          else
+            msg="The conda environment is already up-to-date."
+          fi
         else
           state='failure'
           msg="Relocking the conda environment failed."
