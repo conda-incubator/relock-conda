@@ -126,6 +126,7 @@ runs:
         COMMENT_IS_PR: ${{ github.event.issue.pull_request != null }}
 
     - name: if on issue, get PR, react to comment, and set commit status
+      id: issue_reaction
       if: >-
         steps.check.outputs.skip != 'true'
         && github.event_name == 'issue_comment'
@@ -155,6 +156,9 @@ runs:
           -f "target_url=${url}" \
           -f "description=Relocking the conda environment..." \
           -f "context=relock-conda"
+
+        # save the sha for later
+        echo "sha=${sha}" >> "$GITHUB_OUTPUT"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
@@ -377,7 +381,7 @@ runs:
           msg="Relocking the conda environment failed."
         fi
 
-        sha=$(git rev-parse --verify HEAD)
+        sha=${{ steps.issue_reaction.outputs.sha }}
         url='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
 
         gh api \
