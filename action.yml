@@ -150,7 +150,7 @@ runs:
           --method POST \
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          /repos/${{ github.repository }}/statuses/SHA \
+          /repos/${{ github.repository }}/statuses/${sha} \
           -f "state=pending" \
           -f "target_url=${url}" \
           -f "description=Relocking conda environment..." \
@@ -360,48 +360,34 @@ runs:
 
         echo "relocked=${res}" >> "$GITHUB_OUTPUT"
 
-    - name: if on issue and failure, set commit status
+    - name: if on issue, set final commit status
       if: >-
         steps.check.outputs.skip != 'true'
         && github.event_name == 'issue_comment'
         && startsWith(github.event.comment.body, '/relock-conda')
-        && failure()
+        && always()
       shell: bash -leo pipefail {0}
       run: |
         # set commit status
-        sha=$(git rev-parse --verify HEAD)
-        url='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
-        gh api \
-          --method POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          /repos/${{ github.repository }}/statuses/SHA \
-          -f "state=failure" \
-          -f "target_url=${url}" \
-          -f "description=Relocking conda environment failed." \
-          -f "context=relock-conda"
-      env:
-        GH_TOKEN: ${{ inputs.github-token }}
+        if [[ '${{ steps.relock.outcome }}' == 'success' ]]; then
+          state='success'
+          msg="Relocking conda environment succeeded."
+        else
+          state='failure'
+          msg="Relocking conda environment failed."
+        fi
 
-    - name: if on issue and failure, set commit status
-      if: >-
-        steps.check.outputs.skip != 'true'
-        && github.event_name == 'issue_comment'
-        && startsWith(github.event.comment.body, '/relock-conda')
-        && success()
-      shell: bash -leo pipefail {0}
-      run: |
-        # set commit status
         sha=$(git rev-parse --verify HEAD)
         url='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          /repos/${{ github.repository }}/statuses/SHA \
-          -f "state=success" \
+          /repos/${{ github.repository }}/statuses/${sha} \
+          -f "state=${state}" \
           -f "target_url=${url}" \
-          -f "description=Relocking conda environment succeeded." \
+          -f "description=${msg}" \
           -f "context=relock-conda"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
