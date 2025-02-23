@@ -237,7 +237,7 @@ runs:
           --environment-file='${{ inputs.environment-file }}' \
           --lock-file='${{ inputs.lock-file }}' \
           --ignored-packages='${{ inputs.ignored-packages }}' \
-          --relock-all-packages='${{ inputs.relock-all-packages }}' \
+          --relock-all-packages="${FINAL_RELOCK_ALL_PACKAGES}" \
           --include-only-packages='${{ inputs.include-only-packages }}' \
           > ${{ github.action_path }}/summary.txt
         {
@@ -247,6 +247,8 @@ runs:
         } >> "$GITHUB_OUTPUT"
         rm ${{ github.action_path }}/summary.txt
         echo "::endgroup::"
+      env:
+        FINAL_RELOCK_ALL_PACKAGES: ${{ (inputs.relock-all-packages || (startsWith(github.event.comment.body, '/relock-conda') && contains(github.event.comment.body, '--force'))) && 'true' || 'false' }}
 
     - name: commit changes
       if: >-
