@@ -11,6 +11,8 @@ This action runs [conda-lock](https://github.com/conda/conda-lock) to relock a c
 
 ## Usage
 
+### GitHub Actions Configuration 
+
 Add a GitHub Actions workflow file like this one:
 
 ```yaml
