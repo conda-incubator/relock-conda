@@ -187,9 +187,9 @@ def main(
                         _curr_tuples = sorted(
                             relock_tuples[platform], key=lambda tup: tup[0]
                         )
-                        msg += f"  platform: {platform}\n"
+                        msg += f"  * platform: {platform}\n"
                         for pkg, old_ver, new_ver in _curr_tuples:
-                            msg += f"    - {pkg}: {old_ver} -> {new_ver}\n"
+                            msg += f"      - {pkg}: {old_ver} -> {new_ver}\n"
                         msg += "\n"
 
                     if relock_all_packages:

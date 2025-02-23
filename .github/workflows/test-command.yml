@@ -110,7 +110,7 @@ jobs:
         run: |
           latest_comment=$(gh pr view 112 --json comments --jq '.comments[-1].body')
           echo "latest_comment: ${latest_comment}"
-          num_openssl=$(echo "${latest_comment}" | grep -c "openssl" || echo "0")
+          num_openssl=$(echo "${latest_comment}" | grep -c "openssl" || :)
           echo "num_openssl: ${num_openssl}"
           if [[ '${{ matrix.force }}' == '--force' ]]; then
             expected_num_openssl=1

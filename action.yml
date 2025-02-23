@@ -313,7 +313,7 @@ runs:
         gh pr comment --repo "$GITHUB_REPOSITORY" --body "I've relocked the dependencies with conda-lock!
 
 
-          ${{ steps.relock.outputs.summary }}" '${{ github.event.issue.number }}'
+        ${{ steps.relock.outputs.summary }}" '${{ github.event.issue.number }}'
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
