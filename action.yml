@@ -250,7 +250,7 @@ runs:
       env:
         FINAL_RELOCK_ALL_PACKAGES: ${{ (inputs.relock-all-packages || (startsWith(github.event.comment.body, '/relock-conda') && contains(github.event.comment.body, '--force'))) && 'true' || 'false' }}
         INRAP: ${{ inputs.relock-all-packages }}
-        CMRAP: ${{ startsWith(github.event.comment.body, '/relock-conda') && contains(github.event.comment.body, '--force' }}
+        CMRAP: ${{ startsWith(github.event.comment.body, '/relock-conda') && contains(github.event.comment.body, '--force') }}
         LGRAP: ${{ (inputs.relock-all-packages || (startsWith(github.event.comment.body, '/relock-conda') && contains(github.event.comment.body, '--force'))) }}
 
     - name: commit changes
