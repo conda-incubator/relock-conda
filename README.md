@@ -24,6 +24,9 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+        with:
+          # A GitHub personal access token is required
+          token: ${{ secrets.GITHUB_PAT }}
 
       - name: run
         uses: conda-incubator/relock-conda@main
