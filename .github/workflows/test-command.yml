@@ -40,6 +40,8 @@ jobs:
 
       - name: move relock code to current branch
         run: |
+          git config --global pull.rebase false
+
           if [[ "${IS_PR}" == "true" ]]; then
             branch=pull/${{ github.event.number }}/head
           else
@@ -47,6 +49,7 @@ jobs:
           fi
 
           git checkout main
+          git pull
           sed -i \
             "s#conda-incubator/relock-conda@main#conda-incubator/relock-conda@${branch}#g" \
             .github/workflows/relock.yml
