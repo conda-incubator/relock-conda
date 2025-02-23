@@ -11,6 +11,9 @@ This action runs [conda-lock](https://github.com/conda/conda-lock) to relock a c
 
 ## Usage
 
+- [GitHub Actions Configuration](#github-actions-configuration)
+- [`/relock-conda` Slash Command](#relock-conda-slash-command)
+
 ### GitHub Actions Configuration 
 
 Add a GitHub Actions workflow file like this one:
@@ -87,6 +90,6 @@ jobs:
 
 See the [action.yml](action.yml) for details on possible inputs and options.
 
-### Slash Command
+### `/relock-conda` Slash Command
 
 To trigger relocking of the env on an open PR, put `/relock-conda` in a comment on the PR. If you want to forcibly relock every package, add the `--force` option to the command via `/relock-conda --force`.
