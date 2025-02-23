@@ -15,8 +15,12 @@ jobs:
     name: test relock command
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
+    strategy:
+      max-parallel: 1
+      matrix:
+        force: ["--force", ""]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
           token: ${{ secrets.TEST_PAT }}
@@ -60,9 +64,10 @@ jobs:
 
       - name: trigger relock via comment
         run: |
-          gh pr comment 112 --body "/relock-conda"
+          gh pr comment 112 --body "/relock-conda ${FORCE_RELOCK}"
         env:
           GH_TOKEN: ${{ secrets.TEST_PAT }}
+          FORCE_RELOCK: ${{ matrix.force }}
 
       - name: wait for relock
         run: |
@@ -96,6 +101,25 @@ jobs:
           echo "latest_login: ${latest_login}"
           if [[ "${latest_login}" != "github-actions" ]]; then
             echo "no comment was made!"
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.TEST_PAT }}
+
+      - name: ensure comment is correct
+        run: |
+          latest_comment=$(gh pr view 112 --json comments --jq '.comments[-1].body')
+          echo "latest_comment: ${latest_comment}"
+          num_openssl=$(echo "${latest_comment}" | grep -c "openssl" || :)
+          echo "num_openssl: ${num_openssl}"
+          if [[ '${{ matrix.force }}' == '--force' ]]; then
+            expected_num_openssl=1
+          else
+            expected_num_openssl=0
+          fi
+          echo "expected_num_openssl: ${expected_num_openssl}"
+          if [[ "${num_openssl}" != "${expected_num_openssl}" ]]; then
+            echo "comment is not correct!"
             exit 1
           fi
         env:

@@ -237,7 +237,7 @@ runs:
           --environment-file='${{ inputs.environment-file }}' \
           --lock-file='${{ inputs.lock-file }}' \
           --ignored-packages='${{ inputs.ignored-packages }}' \
-          --relock-all-packages='${{ inputs.relock-all-packages }}' \
+          --relock-all-packages="${FINAL_RELOCK_ALL_PACKAGES}" \
           --include-only-packages='${{ inputs.include-only-packages }}' \
           > ${{ github.action_path }}/summary.txt
         {
@@ -247,6 +247,8 @@ runs:
         } >> "$GITHUB_OUTPUT"
         rm ${{ github.action_path }}/summary.txt
         echo "::endgroup::"
+      env:
+        FINAL_RELOCK_ALL_PACKAGES: ${{ (inputs.relock-all-packages == 'true') || (startsWith(github.event.comment.body, '/relock-conda') && contains(github.event.comment.body, '--force')) }}
 
     - name: commit changes
       if: >-
@@ -311,7 +313,7 @@ runs:
         gh pr comment --repo "$GITHUB_REPOSITORY" --body "I've relocked the dependencies with conda-lock!
 
 
-          ${{ steps.relock.outputs.summary }}" '${{ github.event.issue.number }}'
+        ${{ steps.relock.outputs.summary }}" '${{ github.event.issue.number }}'
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 

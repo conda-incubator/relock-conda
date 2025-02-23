@@ -184,10 +184,20 @@ def main(
                 if any(relock_tuples[platform] for platform in envyml["platforms"]):
                     msg = "The following packages have been updated:\n\n"
                     for platform in envyml["platforms"]:
-                        msg += f"  platform: {platform}\n"
-                        for pkg, old_ver, new_ver in relock_tuples[platform]:
-                            msg += f"    - {pkg}: {old_ver} -> {new_ver}\n"
+                        _curr_tuples = sorted(
+                            relock_tuples[platform], key=lambda tup: tup[0]
+                        )
+                        msg += f"  * platform: {platform}\n"
+                        for pkg, old_ver, new_ver in _curr_tuples:
+                            msg += f"      - {pkg}: {old_ver} -> {new_ver}\n"
                         msg += "\n"
+
+                    if relock_all_packages:
+                        msg += (
+                            "Note: All package updates, even those not to a dependency "
+                            f"listed in your '{environment_file}' file, are listed above because you "
+                            "requested that all packages be relocked.\n"
+                        )
 
                     print(msg, flush=True, file=sys.stderr)
                     print(msg, flush=True)
