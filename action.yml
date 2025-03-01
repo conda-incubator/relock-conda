@@ -279,7 +279,7 @@ runs:
         && steps.relock.outputs.env_relocked == 'true'
         && inputs.action == 'pr'
         && github.event_name != 'issue_comment'
-      uses: peter-evans/create-pull-request@67ccf781d68cd99b580ae25a5c18a1cc84ffff1f
+      uses: peter-evans/create-pull-request@dd2324fc52d5d43c699a5636bcf19fceaa70c284
       with:
         commit-message: relock w/ conda-lock
         title: relock w/ conda-lock
