@@ -14,7 +14,7 @@ This action runs [conda-lock](https://github.com/conda/conda-lock) to relock a c
 - [GitHub Actions Configuration](#github-actions-configuration)
 - [`/relock-conda` Slash Command](#relock-conda-slash-command)
 
-### GitHub Actions Configuration 
+### GitHub Actions Configuration
 
 Add a GitHub Actions workflow file like this one:
 
@@ -52,6 +52,10 @@ jobs:
           # use only these packages to determine if a relock is needed
           include-only-packages: ""  # default
           # include-only-packages: "numpy,scipy"
+
+          # if the conda lock updates only these packages or a subset of them
+          # merge the PR as an admin and do not wait for required CI checks
+          merge-as-admin-packages: ""  # default
 
           # whether to relock on an update to any package in the environment,
           # not just those in the environment file
