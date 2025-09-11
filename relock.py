@@ -58,18 +58,23 @@ def _reformat_lockfile(lockfile):
 @click.option("--ignored-packages", required=True, type=str)
 @click.option("--relock-all-packages", required=True, type=str)
 @click.option("--include-only-packages", required=True, type=str)
+@click.option("--merge-as-admin-packages", required=True, type=str)
 def main(
     environment_file,
     lock_file,
     ignored_packages,
     relock_all_packages,
     include_only_packages,
+    merge_as_admin_packages,
 ):
+    merge_as_admin = False
     relocked = False
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
             ignored_packages = _split_package_list(ignored_packages)
             relock_all_packages = relock_all_packages.lower() == "true"
+            merge_as_admin_packages = _split_package_list(merge_as_admin_packages)
+            include_only_packages = _split_package_list(include_only_packages)
 
             have_existing_lock_file = os.path.exists(lock_file)
 
@@ -123,7 +128,7 @@ def main(
                         for pkg in new_platform_pkg_to_ver[platform]:
                             deps_to_relock.add(pkg)
                 elif include_only_packages:
-                    deps_to_relock = set(_split_package_list(include_only_packages))
+                    deps_to_relock = set(include_only_packages)
                 else:
                     deps_to_relock = set()
                     for _spec in envyml["dependencies"]:
@@ -157,6 +162,12 @@ def main(
                     flush=True,
                     file=sys.stderr,
                 )
+                print(
+                    "merge as admin packages:\n",
+                    pprint.pformat(merge_as_admin_packages),
+                    flush=True,
+                    file=sys.stderr,
+                )
 
                 deps_to_relock = deps_to_relock - set(ignored_packages)
 
@@ -182,6 +193,15 @@ def main(
                             )
 
                 if any(relock_tuples[platform] for platform in envyml["platforms"]):
+                    if all(
+                        all(
+                            tup[0] in merge_as_admin_packages
+                            for tup in relock_tuples[platform]
+                        )
+                        for platform in envyml["platforms"]
+                    ):
+                        merge_as_admin = True
+
                     msg = "The following packages have been updated:\n\n"
                     for platform in envyml["platforms"]:
                         _curr_tuples = sorted(
@@ -216,10 +236,19 @@ def main(
                 shell=True,
             )
 
+            subprocess.run(
+                f'echo "merge_as_admin={"true" if merge_as_admin else "false"}" >> "$GITHUB_OUTPUT"',
+                shell=True,
+            )
+
             raise e
 
     subprocess.run(
         f'echo "env_relocked={"true" if relocked else "false"}" >> "$GITHUB_OUTPUT"',
+        shell=True,
+    )
+    subprocess.run(
+        f'echo "merge_as_admin={"true" if merge_as_admin else "false"}" >> "$GITHUB_OUTPUT"',
         shell=True,
     )
 

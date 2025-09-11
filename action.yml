@@ -24,6 +24,12 @@ inputs:
       ignored-packages is applied to this list
     required: true
     default: ''
+  merge-as-admin-packages:
+    description: >
+      comma-or newline-separated list of packages for which all PR requirements (e.g., CI tests) will be skipped and
+      the PR will be merged immediately, if the updated packages from relocking are a subset thereof
+    required: true
+    default: ''
   relock-all-packages:
     description: 'whether to relock on an update to any package in the environment, not just those in the environment file'
     required: true
@@ -239,6 +245,7 @@ runs:
           --ignored-packages='${{ inputs.ignored-packages }}' \
           --relock-all-packages="${FINAL_RELOCK_ALL_PACKAGES}" \
           --include-only-packages='${{ inputs.include-only-packages }}' \
+          --merge-as-admin-packages='${{ inputs.merge-as-admin-packages }}' \
           > ${{ github.action_path }}/summary.txt
         {
           echo 'summary<<EOF'
@@ -322,6 +329,7 @@ runs:
         steps.check.outputs.skip != 'true'
         && inputs.automerge == 'true'
         && steps.relock.outputs.env_relocked == 'true'
+        && steps.relock.outputs.merge_as_admin == 'false'
         && steps.pr.outputs.pull-request-number != ''
         && inputs.action == 'pr'
         && github.event_name != 'issue_comment'
@@ -329,6 +337,21 @@ runs:
       run: |
         # automerge
         gh pr merge --merge --auto '${{ steps.pr.outputs.pull-request-number }}'
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+
+    - name: merge as admin
+      if: >-
+        steps.check.outputs.skip != 'true'
+        && steps.relock.outputs.env_relocked == 'true'
+        && steps.relock.outputs.merge_as_admin == 'true'
+        && steps.pr.outputs.pull-request-number != ''
+        && inputs.action == 'pr'
+        && github.event_name != 'issue_comment'
+      shell: bash -leo pipefail {0}
+      run: |
+        # merge as admin
+        gh pr merge --merge --admin '${{ steps.pr.outputs.pull-request-number }}'
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
