@@ -65,7 +65,7 @@ def main(
     ignored_packages,
     relock_all_packages,
     include_only_packages,
-    merge_as_admin_packages
+    merge_as_admin_packages,
 ):
     merge_as_admin = False
     relocked = False
@@ -168,7 +168,6 @@ def main(
                     flush=True,
                     file=sys.stderr,
                 )
-
 
                 deps_to_relock = deps_to_relock - set(ignored_packages)
 
