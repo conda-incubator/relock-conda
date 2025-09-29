@@ -34,24 +34,6 @@ def _lock_to_ver(lock, platform):
     return pkg_to_ver
 
 
-def _reformat_lockfile(lockfile):
-    # load / dump the lockfile to make sure it is sorted
-    # so we get nice diffs
-    with open(lockfile) as f:
-        new_lock = yaml.load(f)
-    new_lock["package"] = sorted(
-        new_lock["package"], key=lambda x: (x["name"], x["platform"])
-    )
-    with open(lockfile, "w") as f:
-        yaml.dump(new_lock, f)
-
-    with open(lockfile) as f:
-        lines = [line.rstrip() for line in f]
-
-    with open(lockfile, "w") as f:
-        f.write("\n".join(lines) + "\n")
-
-
 @click.command()
 @click.option("--environment-file", required=True, type=click.Path(exists=True))
 @click.option("--lock-file", required=True, type=click.Path())
@@ -94,7 +76,6 @@ def main(
                 check=True,
                 capture_output=True,
             )
-            _reformat_lockfile(lock_file)
 
             if not have_existing_lock_file:
                 print(
