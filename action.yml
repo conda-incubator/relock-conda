@@ -226,7 +226,7 @@ runs:
           click
           ruamel.yaml
           conda
-          conda-lock
+          conda-lock>=3.0.4
           pygithub
         condarc: |
           channels:
