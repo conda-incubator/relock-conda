@@ -217,7 +217,7 @@ runs:
 
     - name: setup conda-lock
       if: ${{ steps.check.outputs.skip != 'true' }}
-      uses: mamba-org/setup-micromamba@b09ef9b599704322748535812ca03efb2625677b # v1
+      uses: mamba-org/setup-micromamba@add3a49764cedee8ee24e82dfde87f5bc2914462 # v1
       with:
         environment-name: relock-env
         generate-run-shell: false
