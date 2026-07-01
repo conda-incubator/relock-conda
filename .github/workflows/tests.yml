@@ -16,7 +16,7 @@ jobs:
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5
         with:
@@ -47,7 +47,7 @@ jobs:
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - name: relock
         id: relock
@@ -105,7 +105,7 @@ jobs:
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5
         with:
@@ -159,7 +159,7 @@ jobs:
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5
         with:
@@ -208,7 +208,7 @@ jobs:
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - name: relock
         id: relock
@@ -251,7 +251,7 @@ jobs:
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - name: relock
         id: relock
@@ -285,7 +285,7 @@ jobs:
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - name: relock
         id: relock
