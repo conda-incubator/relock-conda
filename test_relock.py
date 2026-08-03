@@ -1,6 +1,6 @@
-from relock import _split_package_list
-
 import pytest
+
+from relock import _split_package_list
 
 
 @pytest.mark.parametrize(

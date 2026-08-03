@@ -14,8 +14,7 @@ def _get_repo_owner_and_name():
         text=True,
     )
     parts = res.stdout.strip().split("/")
-    if parts[-1].endswith(".git"):
-        parts[-1] = parts[-1][: -len(".git")]
+    parts[-1] = parts[-1].removesuffix(".git")
     return parts[-2], parts[-1]
 
 

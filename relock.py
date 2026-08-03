@@ -1,10 +1,10 @@
-from collections.abc import Mapping
 import os
 import pprint
 import shutil
 import subprocess
 import sys
 import tempfile
+from collections.abc import Mapping
 
 import click
 from conda.models.match_spec import MatchSpec
