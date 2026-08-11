@@ -1,10 +1,10 @@
-from collections.abc import Mapping
 import os
 import pprint
 import shutil
 import subprocess
 import sys
 import tempfile
+from collections.abc import Mapping
 
 import click
 from conda.models.match_spec import MatchSpec
@@ -208,29 +208,33 @@ def main(
                     print("No packages have been updated.", flush=True, file=sys.stderr)
                     shutil.move(backup_lock_file, lock_file)
                     relocked = False
-        except Exception as e:
+        except Exception:
             if os.path.exists(backup_lock_file) and have_existing_lock_file:
                 shutil.move(backup_lock_file, lock_file)
 
             subprocess.run(
                 'echo "env_relocked=false" >> "$GITHUB_OUTPUT"',
                 shell=True,
+                check=False,
             )
 
             subprocess.run(
                 f'echo "merge_as_admin={"true" if merge_as_admin else "false"}" >> "$GITHUB_OUTPUT"',
                 shell=True,
+                check=False,
             )
 
-            raise e
+            raise
 
     subprocess.run(
         f'echo "env_relocked={"true" if relocked else "false"}" >> "$GITHUB_OUTPUT"',
         shell=True,
+        check=False,
     )
     subprocess.run(
         f'echo "merge_as_admin={"true" if merge_as_admin else "false"}" >> "$GITHUB_OUTPUT"',
         shell=True,
+        check=False,
     )
 
 
