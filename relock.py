@@ -208,7 +208,7 @@ def main(
                     print("No packages have been updated.", flush=True, file=sys.stderr)
                     shutil.move(backup_lock_file, lock_file)
                     relocked = False
-        except Exception as e:
+        except Exception:
             if os.path.exists(backup_lock_file) and have_existing_lock_file:
                 shutil.move(backup_lock_file, lock_file)
 
