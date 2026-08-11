@@ -129,7 +129,7 @@ def main(
         _commit_via_api(
             git_user_name, git_user_email, lock_file, repo_owner, repo_name, branch
         )
-    except Exception:
+    except Exception:  # noqa: BLE001
         print("Failed to commit via API, trying via CLI...", flush=True)
         _commit_via_cli(
             git_user_name, git_user_email, lock_file, repo_owner, repo_name, branch
