@@ -224,7 +224,7 @@ def main(
                 check=False,
             )
 
-            raise e
+            raise
 
     subprocess.run(
         f'echo "env_relocked={"true" if relocked else "false"}" >> "$GITHUB_OUTPUT"',
