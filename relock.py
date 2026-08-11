@@ -215,11 +215,13 @@ def main(
             subprocess.run(
                 'echo "env_relocked=false" >> "$GITHUB_OUTPUT"',
                 shell=True,
+                check=False,
             )
 
             subprocess.run(
                 f'echo "merge_as_admin={"true" if merge_as_admin else "false"}" >> "$GITHUB_OUTPUT"',
                 shell=True,
+                check=False,
             )
 
             raise e
@@ -227,10 +229,12 @@ def main(
     subprocess.run(
         f'echo "env_relocked={"true" if relocked else "false"}" >> "$GITHUB_OUTPUT"',
         shell=True,
+        check=False,
     )
     subprocess.run(
         f'echo "merge_as_admin={"true" if merge_as_admin else "false"}" >> "$GITHUB_OUTPUT"',
         shell=True,
+        check=False,
     )
 
 
