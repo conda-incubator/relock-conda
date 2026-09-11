@@ -7,4 +7,4 @@ platforms:
   - osx-64
 dependencies:
   - python
-  - numpy
+  - numpy ==100
