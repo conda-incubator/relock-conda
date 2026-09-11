@@ -222,12 +222,12 @@ runs:
         environment-name: relock-env
         generate-run-shell: false
         create-args: >-
-          python
           click
-          ruamel.yaml
           conda
           conda-lock>=3.0.4
           pygithub
+          python
+          ruamel.yaml
         condarc: |
           channels:
             - conda-forge
@@ -238,7 +238,6 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         # relock
-        echo "::group::relock"
         python ${{ github.action_path }}/relock.py \
           --environment-file='${{ inputs.environment-file }}' \
           --lock-file='${{ inputs.lock-file }}' \
@@ -253,7 +252,6 @@ runs:
           echo EOF
         } >> "$GITHUB_OUTPUT"
         rm ${{ github.action_path }}/summary.txt
-        echo "::endgroup::"
       env:
         FINAL_RELOCK_ALL_PACKAGES: ${{ (inputs.relock-all-packages == 'true') || (startsWith(github.event.comment.body, '/relock-conda') && contains(github.event.comment.body, '--force')) }}
 

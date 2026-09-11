@@ -51,6 +51,7 @@ def main(
 ):
     merge_as_admin = False
     relocked = False
+    relock_res = None
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
             ignored_packages = _split_package_list(ignored_packages)
@@ -71,11 +72,20 @@ def main(
                 )
 
             print("Relocking environment.yml...", flush=True, file=sys.stderr)
-            subprocess.run(
+            relock_res = subprocess.run(
                 ["conda-lock", "--file", environment_file, "--lockfile", lock_file],
-                check=True,
-                capture_output=True,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
             )
+            if relock_res.returncode != 0:
+                print(
+                    f"Could not relock environment!\nconda-lock output:\n{relock_res.stdout}",
+                    flush=True,
+                    file=sys.stderr,
+                )
+                relock_res.check_returncode()
 
             if not have_existing_lock_file:
                 print(

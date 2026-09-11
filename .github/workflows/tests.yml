@@ -20,7 +20,6 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5
         with:
-          python-version: 3.11
           channels: conda-forge
           channel-priority: strict
           show-channel-urls: true
@@ -109,7 +108,6 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5
         with:
-          python-version: 3.11
           channels: conda-forge
           channel-priority: strict
           show-channel-urls: true
@@ -120,7 +118,7 @@ jobs:
         run: |
           conda install --yes conda-lock
           cp test-env.yml old-test-env.yml
-          echo "  - python =3.8" >> old-test-env.yml
+          echo "  - python =3.11" >> old-test-env.yml
           conda-lock lock --file old-test-env.yml
 
       - name: make a copy of lock file
@@ -163,7 +161,6 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5
         with:
-          python-version: 3.11
           channels: conda-forge
           channel-priority: strict
           show-channel-urls: true
