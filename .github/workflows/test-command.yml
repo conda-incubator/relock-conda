@@ -140,15 +140,15 @@ jobs:
         run: |
           latest_comment=$(gh pr view 112 --json comments --jq '.comments[-1].body')
           echo "latest_comment: ${latest_comment}"
-          num_openssl=$(echo "${latest_comment}" | grep -c "openssl" || :)
-          echo "num_openssl: ${num_openssl}"
+          num_note=$(echo "${latest_comment}" | grep -c "Note" || :)
+          echo "num_note: ${num_note}"
           if [[ '${{ matrix.force }}' == '--force' ]]; then
-            expected_num_openssl=1
+            expected_num_note=1
           else
-            expected_num_openssl=0
+            expected_num_note=0
           fi
-          echo "expected_num_openssl: ${expected_num_openssl}"
-          if [[ "${num_openssl}" != "${expected_num_openssl}" ]]; then
+          echo "expected_num_note: ${expected_num_note}"
+          if [[ "${num_note}" != "${expected_num_note}" ]]; then
             echo "comment is not correct!"
             exit 1
           fi
