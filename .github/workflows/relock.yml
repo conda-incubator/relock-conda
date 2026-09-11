@@ -16,5 +16,5 @@ jobs:
         uses: conda-incubator/relock-conda@pull/498/head
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          git-user-name: '6d3d1faa181a432b9b1ab611f8254df0'
+          git-user-name: '0ee5d6530b224881bdddcf737122f27a'
 
