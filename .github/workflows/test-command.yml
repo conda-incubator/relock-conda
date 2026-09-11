@@ -71,8 +71,9 @@ jobs:
 
           git checkout main
           git pull
+          cp relock.yml.template .github/workflows/relock.yml
           sed -i \
-            "s#conda-incubator/relock-conda@main#conda-incubator/relock-conda@${branch}#g" \
+            "s#@@BRANCH@@#${branch}#g" \
             .github/workflows/relock.yml
           sed -i \
             "s#@@GIT_USER_NAME@@#${UID}#g" \
@@ -159,24 +160,6 @@ jobs:
         if: always()
         shell: bash -leo pipefail {0}
         run: |
-          if [[ "${IS_PR}" == "true" ]]; then
-            branch=pull/${{ github.event.number }}/head
-          else
-            branch=main
-          fi
-          git checkout main
-          sed -i \
-            "s#conda-incubator/relock-conda@${branch}#conda-incubator/relock-conda@main#g" \
-            .github/workflows/relock.yml
-
-          sed -i \
-            "s#${UID}#@@GIT_USER_NAME@@#g" \
-            .github/workflows/relock.yml
-
-          git add .github/workflows/relock.yml
-          git commit -m "[ci skip] move relock code back to main" --allow-empty
-          git push
-
           gh pr checkout 112
           echo -e "  - python =3.13\n" >> environment.yml
           conda-lock
