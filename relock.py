@@ -81,7 +81,7 @@ def main(
             )
             if relock_res.returncode != 0:
                 print(
-                    "Could not relock environment!\nconda-lock output:\n{relock_res.stdout}",
+                    f"Could not relock environment!\nconda-lock output:\n{relock_res.stdout}",
                     flush=True,
                     file=sys.stderr,
                 )
