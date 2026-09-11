@@ -25,7 +25,26 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.TEST_PAT }}
 
+      - uses: conda-incubator/setup-miniconda@8ee1f361103df19b6f8c8655fd3967a8ecb162d5
+        with:
+          channels: conda-forge
+          channel-priority: strict
+          show-channel-urls: true
+          miniforge-version: latest
+
+      - name: install deps
+        shell: bash -leo pipefail {0}
+        run: |
+          conda install --yes \
+            click \
+            ruamel.yaml \
+            conda \
+            conda-lock \
+            pytest \
+            pygithub
+
       - name: backup lock file
+        shell: bash -leo pipefail {0}
         run: |
           gh pr checkout 112
           cp conda-lock.yml ../conda-lock-backup.yml
@@ -34,11 +53,13 @@ jobs:
 
       - name: make uid
         id: uid
+        shell: bash -leo pipefail {0}
         run: |
           uid=$(od -x /dev/urandom | head -1 | awk '{OFS="-"; print $2$3,$4,$5,$6,$7$8$9}')
           echo "uid=${uid}" > "$GITHUB_OUTPUT"
 
       - name: move relock code to current branch
+        shell: bash -leo pipefail {0}
         run: |
           git config --global pull.rebase false
 
@@ -66,6 +87,7 @@ jobs:
           UID: ${{ steps.uid.outputs.uid }}
 
       - name: trigger relock via comment
+        shell: bash -leo pipefail {0}
         run: |
           gh pr comment 112 --body "/relock-conda ${FORCE_RELOCK}"
         env:
@@ -73,10 +95,12 @@ jobs:
           FORCE_RELOCK: ${{ matrix.force }}
 
       - name: wait for relock
+        shell: bash -leo pipefail {0}
         run: |
-          sleep 60
+          sleep 90
 
       - name: check for updates
+        shell: bash -leo pipefail {0}
         run: |
           gh pr checkout 112
           diffval=$(diff conda-lock.yml ../conda-lock-backup.yml || :)
@@ -88,6 +112,7 @@ jobs:
           GH_TOKEN: ${{ secrets.TEST_PAT }}
 
       - name: ensure git committer is correct
+        shell: bash -leo pipefail {0}
         run: |
           loginfo=$(git log --name-status HEAD^..HEAD)
           echo "${loginfo}"
@@ -99,6 +124,7 @@ jobs:
           UID: ${{ steps.uid.outputs.uid }}
 
       - name: ensure a comment was made
+        shell: bash -leo pipefail {0}
         run: |
           latest_login=$(gh pr view 112 --json comments --jq '.comments[-1].author.login')
           echo "latest_login: ${latest_login}"
@@ -110,6 +136,7 @@ jobs:
           GH_TOKEN: ${{ secrets.TEST_PAT }}
 
       - name: ensure comment is correct
+        shell: bash -leo pipefail {0}
         run: |
           latest_comment=$(gh pr view 112 --json comments --jq '.comments[-1].body')
           echo "latest_comment: ${latest_comment}"
@@ -130,6 +157,7 @@ jobs:
 
       - name: cleanup
         if: always()
+        shell: bash -leo pipefail {0}
         run: |
           if [[ "${IS_PR}" == "true" ]]; then
             branch=pull/${{ github.event.number }}/head
