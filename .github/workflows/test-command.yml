@@ -177,7 +177,7 @@ jobs:
           git push
 
           gh pr checkout 112
-          echo "  - python =3.13\n" >> environment.yml
+          echo -e "  - python =3.13\n" >> environment.yml
           conda-lock
           git checkout -- environment.yml
           git add conda-lock.yml
