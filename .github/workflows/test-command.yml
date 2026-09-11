@@ -150,7 +150,9 @@ jobs:
           git push
 
           gh pr checkout 112
-          cp ../conda-lock-backup.yml conda-lock.yml
+          echo "  - python =3.13\n" >> environment.yml
+          conda-lock
+          git checkout -- environment.yml
           git add conda-lock.yml
           git commit -m "[ci skip] restore old lock file" --allow-empty
           git push
