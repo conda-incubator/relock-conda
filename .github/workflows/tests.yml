@@ -120,7 +120,7 @@ jobs:
         run: |
           conda install --yes conda-lock
           cp test-env.yml old-test-env.yml
-          echo "  - python =3.8" >> old-test-env.yml
+          echo "  - python =3.11" >> old-test-env.yml
           conda-lock lock --file old-test-env.yml
 
       - name: make a copy of lock file
