@@ -13,8 +13,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: run
-        uses: conda-incubator/relock-conda@pull/485/head
+        uses: conda-incubator/relock-conda@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          git-user-name: 'ce83563b-3e78-2e5e-d4d5-03d4c07b4a6e'
+          git-user-name: '@@GIT_USER_NAME@@'
 
