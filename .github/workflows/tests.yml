@@ -106,6 +106,26 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
+      - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb
+        with:
+          channels: conda-forge
+          channel-priority: strict
+          show-channel-urls: true
+          miniforge-version: latest
+
+      - name: make the lock file
+        shell: bash -leo pipefail {0}
+        run: |
+          conda install --yes conda-lock
+          cp test-env.yml old-test-env.yml
+          echo "  - numpy =2.2" >> old-test-env.yml
+          conda-lock lock --file old-test-env.yml
+
+      - name: make a copy of lock file
+        shell: bash -leo pipefail {0}
+        run: |
+          cp conda-lock.yml old-conda-lock.yml
+
       - name: relock
         id: relock
         uses: ./
@@ -114,10 +134,7 @@ jobs:
           lock-file: conda-lock.yml
           update-packages: numpy
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          automerge: false
-          base-branch: ${{ github.head_ref }}
-          head-branch: tests-update
-          draft: true
+          action: 'file'
 
       - name: did it relock?
         if: steps.relock.outputs.relocked != 'true'
@@ -131,29 +148,15 @@ jobs:
             exit 1
           fi
 
-      - name: test that PR is OK
+      - name: test that lock file is different
         if: steps.relock.outputs.relocked == 'true'
         shell: bash
         run: |
-          gh pr checkout ${{ steps.relock.outputs.pull-request-number }}
-          ls -lah
-          if [ -f conda-lock.yml ]; then
-            :  # do nothing
-          else
-            echo "conda-lock.yml not found"
+          val=$(diff conda-lock.yml old-conda-lock.yml || :)
+          if [[ "${val}" == "" ]]; then
+            echo "lock files are the same"
             exit 1
           fi
-          grep numpy conda-lock.yml
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: close PR
-        if: always()
-        continue-on-error: true
-        shell: bash
-        run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   tests-file:
     name: test updates w/ file
