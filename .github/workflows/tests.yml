@@ -179,7 +179,7 @@ jobs:
           conda install --yes conda-lock
           cp test-env.yml old-test-env.yml
           echo "  - python =3.11" >> old-test-env.yml
-          conda-lock lock --file old-test-env.yml
+          conda-lock lock --no-mamba --no-micromamba --file old-test-env.yml
 
       - name: make a copy of lock file
         shell: bash -leo pipefail {0}
@@ -230,7 +230,7 @@ jobs:
         shell: bash -leo pipefail {0}
         run: |
           conda install --yes conda-lock
-          conda-lock lock --file test-env.yml --lockfile conda-lockk.yml
+          conda-lock lock --no-mamba --no-micromamba --file test-env.yml --lockfile conda-lockk.yml
 
       - name: relock
         id: relock
