@@ -69,7 +69,13 @@ def main(
                 shutil.copy2(lock_file, backup_lock_file)
 
                 print("Relocking environment.yml...", flush=True, file=sys.stderr)
-                cmd = ["conda-lock", "--no-mamba", "--no-micromamba", "--lockfile", lock_file]
+                cmd = [
+                    "conda-lock",
+                    "--no-mamba",
+                    "--no-micromamba",
+                    "--lockfile",
+                    lock_file,
+                ]
                 for pkg in update_packages:
                     cmd += ["--update", pkg]
                 relock_res = subprocess.run(
@@ -91,7 +97,15 @@ def main(
 
                 print("Relocking environment.yml...", flush=True, file=sys.stderr)
                 relock_res = subprocess.run(
-                    ["conda-lock", "--no-mamba", "--no-micromamba", "--file", environment_file, "--lockfile", lock_file],
+                    [
+                        "conda-lock",
+                        "--no-mamba",
+                        "--no-micromamba",
+                        "--file",
+                        environment_file,
+                        "--lockfile",
+                        lock_file,
+                    ],
                     check=False,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
