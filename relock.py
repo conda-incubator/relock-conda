@@ -98,7 +98,11 @@ def main(
                     text=True,
                 )
 
-            print(f"stdout:\n{relock_res.stdout}\nstderr:\n{relock_res.stderr}", flush=True)
+            print(
+                f"stdout:\n{relock_res.stdout}\nstderr:\n{relock_res.stderr}",
+                file=sys.stderr,
+                flush=True,
+            )
 
             if relock_res.returncode != 0:
                 print(
