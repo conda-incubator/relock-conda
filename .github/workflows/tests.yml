@@ -42,7 +42,7 @@ jobs:
           pytest -vvs test_relock.py
 
   tests-lock:
-    name: test updates
+    name: test locks
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
