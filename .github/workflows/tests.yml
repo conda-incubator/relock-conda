@@ -99,8 +99,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  tests-update:
-    name: test update
+  tests-update-package:
+    name: test update package
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
