@@ -211,7 +211,7 @@ jobs:
             exit 1
           fi
 
-  tests-no-lock:
+  tests-no-update:
     name: test no update
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
