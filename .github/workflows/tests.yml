@@ -99,6 +99,62 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  tests-update:
+    name: test updates
+    runs-on: "ubuntu-latest"
+    if: github.event.pull_request.title != 'relock w/ conda-lock'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: relock
+        id: relock
+        uses: ./
+        with:
+          environment-file: test-env.yml
+          lock-file: conda-lock.yml
+          update-packages: numpy
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          automerge: false
+          base-branch: ${{ github.head_ref }}
+          head-branch: tests-update
+          draft: true
+
+      - name: did it relock?
+        if: steps.relock.outputs.relocked != 'true'
+        run: exit 1
+
+      - name: check the summary
+        if: steps.relock.outputs.relocked == 'true'
+        run: |
+          echo ${{ steps.relock.outputs.summary }}
+          if [[ "${{ steps.relock.outputs.summary }}" == "" ]]; then
+            exit 1
+          fi
+
+      - name: test that PR is OK
+        if: steps.relock.outputs.relocked == 'true'
+        shell: bash
+        run: |
+          gh pr checkout ${{ steps.relock.outputs.pull-request-number }}
+          ls -lah
+          if [ -f conda-lock.yml ]; then
+            :  # do nothing
+          else
+            echo "conda-lock.yml not found"
+            exit 1
+          fi
+          grep numpy conda-lock.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: close PR
+        if: always()
+        continue-on-error: true
+        shell: bash
+        run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   tests-file:
     name: test updates w/ file
     runs-on: "ubuntu-latest"

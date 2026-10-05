@@ -14,6 +14,12 @@ inputs:
     description: 'the lock file to update'
     required: true
     default: 'conda-lock.yml'
+  update-packages:
+    description: >
+      comma- or newline-separated list of packages to update, options `ignored-packages`, `include-only-packages`, 
+      and `relock-all-packages` are ignored if given, calls `conda-lock lock --update <pkg1> --update <pkg1> ...`
+    required: true
+    default: ''
   ignored-packages:
     description: 'comma- or newline-separated list of packages whose version changes are ignored when relocking'
     required: true
@@ -228,6 +234,7 @@ runs:
           pygithub
           python
           ruamel.yaml
+          mamba <=2.7
         condarc: |
           channels:
             - conda-forge
@@ -241,6 +248,7 @@ runs:
         python ${{ github.action_path }}/relock.py \
           --environment-file='${{ inputs.environment-file }}' \
           --lock-file='${{ inputs.lock-file }}' \
+          --update-packages='${{ inputs.update-packages }}' \
           --ignored-packages='${{ inputs.ignored-packages }}' \
           --relock-all-packages="${FINAL_RELOCK_ALL_PACKAGES}" \
           --include-only-packages='${{ inputs.include-only-packages }}' \
