@@ -119,7 +119,7 @@ jobs:
           conda install --yes conda-lock
           cp test-env.yml test-env.yml.bak
           echo "  - numpy =2.2" >> test-env.yml
-          conda-lock lock --file test-env.yml
+          conda-lock lock --no-mamba --no-micromamba --file test-env.yml
           mv test-env.yml.bak test-env.yml
 
       - name: make a copy of lock file
