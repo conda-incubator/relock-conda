@@ -229,7 +229,7 @@ jobs:
       - name: make the lock file
         shell: bash -leo pipefail {0}
         run: |
-          conda install --yes conda-lock
+          conda install --yes conda-lock mamba=2.7
           conda-lock lock --file test-env.yml --lockfile conda-lockk.yml
 
       - name: relock
