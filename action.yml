@@ -234,7 +234,7 @@ runs:
           pygithub
           python
           ruamel.yaml
-          mamba <=2.7
+          mamba<=2.7
         condarc: |
           channels:
             - conda-forge
