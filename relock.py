@@ -97,6 +97,9 @@ def main(
                     stderr=subprocess.STDOUT,
                     text=True,
                 )
+
+            print(f"stdout:\n{relock_res.stdout}\nstderr:\n{relock_res.stderr}", flush=True)
+
             if relock_res.returncode != 0:
                 print(
                     f"Could not relock environment!\nconda-lock output:\n{relock_res.stdout}",
