@@ -69,7 +69,7 @@ jobs:
       - name: check the summary
         if: steps.relock.outputs.relocked == 'true'
         run: |
-          echo ${{ steps.relock.outputs.summary }}
+          echo '${{ steps.relock.outputs.summary }}'
           if [[ "${{ steps.relock.outputs.summary }}" == "" ]]; then
             exit 1
           fi
@@ -144,7 +144,7 @@ jobs:
       - name: check the summary
         if: steps.relock.outputs.relocked == 'true'
         run: |
-          echo ${{ steps.relock.outputs.summary }}
+          echo '${{ steps.relock.outputs.summary }}'
           if [[ "${{ steps.relock.outputs.summary }}" == "" ]]; then
             exit 1
           fi
