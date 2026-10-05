@@ -42,7 +42,7 @@ jobs:
           pytest -vvs test_relock.py
 
   tests-lock:
-    name: test updates
+    name: test locks
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
@@ -69,7 +69,7 @@ jobs:
       - name: check the summary
         if: steps.relock.outputs.relocked == 'true'
         run: |
-          echo ${{ steps.relock.outputs.summary }}
+          echo '${{ steps.relock.outputs.summary }}'
           if [[ "${{ steps.relock.outputs.summary }}" == "" ]]; then
             exit 1
           fi
@@ -98,6 +98,66 @@ jobs:
         run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  tests-update-package:
+    name: test update package
+    runs-on: "ubuntu-latest"
+    if: github.event.pull_request.title != 'relock w/ conda-lock'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb
+        with:
+          channels: conda-forge
+          channel-priority: strict
+          show-channel-urls: true
+          miniforge-version: latest
+
+      - name: make the lock file
+        shell: bash -leo pipefail {0}
+        run: |
+          conda install --yes conda-lock mamba=2.7
+          cp test-env.yml test-env.yml.bak
+          echo "  - numpy =2.2" >> test-env.yml
+          conda-lock lock --file test-env.yml
+          mv test-env.yml.bak test-env.yml
+
+      - name: make a copy of lock file
+        shell: bash -leo pipefail {0}
+        run: |
+          cp conda-lock.yml old-conda-lock.yml
+
+      - name: relock
+        id: relock
+        uses: ./
+        with:
+          environment-file: test-env.yml
+          lock-file: conda-lock.yml
+          update-packages: numpy
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          action: 'file'
+
+      - name: did it relock?
+        if: steps.relock.outputs.relocked != 'true'
+        run: exit 1
+
+      - name: check the summary
+        if: steps.relock.outputs.relocked == 'true'
+        run: |
+          echo '${{ steps.relock.outputs.summary }}'
+          if [[ "${{ steps.relock.outputs.summary }}" == "" ]]; then
+            exit 1
+          fi
+
+      - name: test that lock file is different
+        if: steps.relock.outputs.relocked == 'true'
+        shell: bash
+        run: |
+          val=$(diff conda-lock.yml old-conda-lock.yml || :)
+          if [[ "${val}" == "" ]]; then
+            echo "lock files are the same"
+            exit 1
+          fi
 
   tests-file:
     name: test updates w/ file
@@ -152,7 +212,7 @@ jobs:
             exit 1
           fi
 
-  tests-no-lock:
+  tests-no-update:
     name: test no update
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
@@ -169,7 +229,7 @@ jobs:
       - name: make the lock file
         shell: bash -leo pipefail {0}
         run: |
-          conda install --yes conda-lock
+          conda install --yes conda-lock mamba=2.7
           conda-lock lock --file test-env.yml --lockfile conda-lockk.yml
 
       - name: relock

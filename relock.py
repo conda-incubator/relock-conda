@@ -37,6 +37,7 @@ def _lock_to_ver(lock, platform):
 @click.command()
 @click.option("--environment-file", required=True, type=click.Path(exists=True))
 @click.option("--lock-file", required=True, type=click.Path())
+@click.option("--update-packages", required=True, type=str)
 @click.option("--ignored-packages", required=True, type=str)
 @click.option("--relock-all-packages", required=True, type=str)
 @click.option("--include-only-packages", required=True, type=str)
@@ -44,6 +45,7 @@ def _lock_to_ver(lock, platform):
 def main(
     environment_file,
     lock_file,
+    update_packages,
     ignored_packages,
     relock_all_packages,
     include_only_packages,
@@ -54,31 +56,54 @@ def main(
     relock_res = None
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
+            update_packages = _split_package_list(update_packages)
             ignored_packages = _split_package_list(ignored_packages)
             relock_all_packages = relock_all_packages.lower() == "true"
             merge_as_admin_packages = _split_package_list(merge_as_admin_packages)
             include_only_packages = _split_package_list(include_only_packages)
 
             have_existing_lock_file = os.path.exists(lock_file)
-
             backup_lock_file = os.path.join(tmpdir, os.path.basename(lock_file))
-            if have_existing_lock_file:
-                shutil.move(lock_file, backup_lock_file)
+
+            if update_packages and have_existing_lock_file:
+                shutil.copy2(lock_file, backup_lock_file)
+
+                print("Relocking environment.yml...", flush=True, file=sys.stderr)
+                cmd = ["conda-lock", "--lockfile", lock_file]
+                for pkg in update_packages:
+                    cmd += ["--update", pkg]
+                relock_res = subprocess.run(
+                    cmd,
+                    check=False,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                )
             else:
-                print(
-                    "No existing lock file found. Creating a new one.",
-                    flush=True,
-                    file=sys.stderr,
+                if have_existing_lock_file:
+                    shutil.move(lock_file, backup_lock_file)
+                else:
+                    print(
+                        "No existing lock file found. Creating a new one.",
+                        flush=True,
+                        file=sys.stderr,
+                    )
+
+                print("Relocking environment.yml...", flush=True, file=sys.stderr)
+                relock_res = subprocess.run(
+                    ["conda-lock", "--file", environment_file, "--lockfile", lock_file],
+                    check=False,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
                 )
 
-            print("Relocking environment.yml...", flush=True, file=sys.stderr)
-            relock_res = subprocess.run(
-                ["conda-lock", "--file", environment_file, "--lockfile", lock_file],
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
+            print(
+                f"stdout:\n{relock_res.stdout}\nstderr:\n{relock_res.stderr}",
+                file=sys.stderr,
+                flush=True,
             )
+
             if relock_res.returncode != 0:
                 print(
                     f"Could not relock environment!\nconda-lock output:\n{relock_res.stdout}",
@@ -113,7 +138,9 @@ def main(
                     for platform in envyml["platforms"]
                 }
 
-                if relock_all_packages:
+                if update_packages:
+                    deps_to_relock = {pkg for pkg in update_packages}
+                elif relock_all_packages:
                     deps_to_relock = set()
                     for platform in envyml["platforms"]:
                         for pkg in new_platform_pkg_to_ver[platform]:
@@ -129,38 +156,39 @@ def main(
                             for _pkg in _spec:
                                 deps_to_relock.add(MatchSpec(_pkg).name)
 
-                print(
-                    "relock all packages:",
-                    relock_all_packages,
-                    flush=True,
-                    file=sys.stderr,
-                )
-                print(
-                    "initial deps to relock:\n",
-                    pprint.pformat(deps_to_relock),
-                    flush=True,
-                    file=sys.stderr,
-                )
-                print(
-                    "ignored packages:\n",
-                    pprint.pformat(ignored_packages),
-                    flush=True,
-                    file=sys.stderr,
-                )
-                print(
-                    "include only packages:\n",
-                    pprint.pformat(include_only_packages),
-                    flush=True,
-                    file=sys.stderr,
-                )
-                print(
-                    "merge as admin packages:\n",
-                    pprint.pformat(merge_as_admin_packages),
-                    flush=True,
-                    file=sys.stderr,
-                )
+                if not update_packages:
+                    print(
+                        "relock all packages:",
+                        relock_all_packages,
+                        flush=True,
+                        file=sys.stderr,
+                    )
+                    print(
+                        "initial deps to relock:\n",
+                        pprint.pformat(deps_to_relock),
+                        flush=True,
+                        file=sys.stderr,
+                    )
+                    print(
+                        "ignored packages:\n",
+                        pprint.pformat(ignored_packages),
+                        flush=True,
+                        file=sys.stderr,
+                    )
+                    print(
+                        "include only packages:\n",
+                        pprint.pformat(include_only_packages),
+                        flush=True,
+                        file=sys.stderr,
+                    )
+                    print(
+                        "merge as admin packages:\n",
+                        pprint.pformat(merge_as_admin_packages),
+                        flush=True,
+                        file=sys.stderr,
+                    )
 
-                deps_to_relock = deps_to_relock - set(ignored_packages)
+                    deps_to_relock = deps_to_relock - set(ignored_packages)
 
                 print(
                     "final deps to relock:\n",
