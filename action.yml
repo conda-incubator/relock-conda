@@ -223,7 +223,7 @@ runs:
 
     - name: setup conda-lock
       if: ${{ steps.check.outputs.skip != 'true' }}
-      uses: mamba-org/setup-micromamba@f457c30a868e4760d3a6fcea5f25dc655b8edf39 # v1
+      uses: mamba-org/setup-micromamba@f457c30a868e4760d3a6fcea5f25dc655b8edf39
       with:
         environment-name: relock-env
         generate-run-shell: false
@@ -234,7 +234,7 @@ runs:
           pygithub
           python
           ruamel.yaml
-          mamba<=2.7
+          micromamba<2.8
         condarc: |
           channels:
             - conda-forge

@@ -69,7 +69,13 @@ def main(
                 shutil.copy2(lock_file, backup_lock_file)
 
                 print("Relocking environment.yml...", flush=True, file=sys.stderr)
-                cmd = ["conda-lock", "--lockfile", lock_file]
+                cmd = [
+                    "conda-lock",
+                    "--no-mamba",
+                    "--micromamba",
+                    "--lockfile",
+                    lock_file,
+                ]
                 for pkg in update_packages:
                     cmd += ["--update", pkg]
                 relock_res = subprocess.run(
@@ -91,18 +97,20 @@ def main(
 
                 print("Relocking environment.yml...", flush=True, file=sys.stderr)
                 relock_res = subprocess.run(
-                    ["conda-lock", "--file", environment_file, "--lockfile", lock_file],
+                    [
+                        "conda-lock",
+                        "--no-mamba",
+                        "--micromamba",
+                        "--file",
+                        environment_file,
+                        "--lockfile",
+                        lock_file,
+                    ],
                     check=False,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                     text=True,
                 )
-
-            print(
-                f"stdout:\n{relock_res.stdout}\nstderr:\n{relock_res.stderr}",
-                file=sys.stderr,
-                flush=True,
-            )
 
             if relock_res.returncode != 0:
                 print(
@@ -111,6 +119,12 @@ def main(
                     file=sys.stderr,
                 )
                 relock_res.check_returncode()
+            else:
+                print(
+                    f"output:\n{relock_res.stdout}",
+                    file=sys.stderr,
+                    flush=True,
+                )
 
             if not have_existing_lock_file:
                 print(

@@ -116,10 +116,10 @@ jobs:
       - name: make the lock file
         shell: bash -leo pipefail {0}
         run: |
-          conda install --yes conda-lock mamba=2.7
+          conda install --yes conda-lock "micromamba<2.8"
           cp test-env.yml test-env.yml.bak
           echo "  - numpy =2.2" >> test-env.yml
-          conda-lock lock --file test-env.yml
+          conda-lock lock --no-mamba --micromamba --file test-env.yml
           mv test-env.yml.bak test-env.yml
 
       - name: make a copy of lock file
@@ -176,10 +176,10 @@ jobs:
       - name: make the lock file
         shell: bash -leo pipefail {0}
         run: |
-          conda install --yes conda-lock
+          conda install --yes conda-lock "micromamba<2.8"
           cp test-env.yml old-test-env.yml
           echo "  - python =3.11" >> old-test-env.yml
-          conda-lock lock --file old-test-env.yml
+          conda-lock lock --no-mamba --micromamba --file old-test-env.yml
 
       - name: make a copy of lock file
         shell: bash -leo pipefail {0}
@@ -229,8 +229,8 @@ jobs:
       - name: make the lock file
         shell: bash -leo pipefail {0}
         run: |
-          conda install --yes conda-lock mamba=2.7
-          conda-lock lock --file test-env.yml --lockfile conda-lockk.yml
+          conda install --yes conda-lock "micromamba<2.8"
+          conda-lock lock --no-mamba --micromamba --file test-env.yml --lockfile conda-lockk.yml
 
       - name: relock
         id: relock
