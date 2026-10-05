@@ -72,7 +72,7 @@ def main(
                 cmd = [
                     "conda-lock",
                     "--no-mamba",
-                    "--no-micromamba",
+                    "--micromamba",
                     "--lockfile",
                     lock_file,
                 ]
@@ -100,7 +100,7 @@ def main(
                     [
                         "conda-lock",
                         "--no-mamba",
-                        "--no-micromamba",
+                        "--micromamba",
                         "--file",
                         environment_file,
                         "--lockfile",
@@ -112,12 +112,6 @@ def main(
                     text=True,
                 )
 
-            print(
-                f"stdout:\n{relock_res.stdout}\nstderr:\n{relock_res.stderr}",
-                file=sys.stderr,
-                flush=True,
-            )
-
             if relock_res.returncode != 0:
                 print(
                     f"Could not relock environment!\nconda-lock output:\n{relock_res.stdout}",
@@ -125,6 +119,12 @@ def main(
                     file=sys.stderr,
                 )
                 relock_res.check_returncode()
+            else:
+                print(
+                    f"output:\n{relock_res.stdout}",
+                    file=sys.stderr,
+                    flush=True,
+                )
 
             if not have_existing_lock_file:
                 print(

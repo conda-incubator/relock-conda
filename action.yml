@@ -234,6 +234,7 @@ runs:
           pygithub
           python
           ruamel.yaml
+          micromamba<2.8
         condarc: |
           channels:
             - conda-forge
