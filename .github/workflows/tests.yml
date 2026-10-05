@@ -117,9 +117,10 @@ jobs:
         shell: bash -leo pipefail {0}
         run: |
           conda install --yes conda-lock mamba=2.7
-          cp test-env.yml old-test-env.yml
-          echo "  - numpy =2.2" >> old-test-env.yml
-          conda-lock lock --file old-test-env.yml
+          cp test-env.yml test-env.yml.bak
+          echo "  - numpy =2.2" >> test-env.yml
+          conda-lock lock --file test-env.yml
+          mv test-env.yml.bak test-env.yml
 
       - name: make a copy of lock file
         shell: bash -leo pipefail {0}
