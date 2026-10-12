@@ -18,23 +18,14 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
-      - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
-          channels: conda-forge
-          channel-priority: strict
-          show-channel-urls: true
-          miniforge-version: latest
+          python-version: '3.14'
 
-      - name: install deps
+      - name: install conda-lock
         shell: bash -leo pipefail {0}
         run: |
-          conda install --yes \
-            click \
-            ruamel.yaml \
-            conda \
-            conda-lock \
-            pytest \
-            pygithub
+          pip install -r requirements.txt pytest
 
       - name: run tests
         shell: bash -leo pipefail {0}
@@ -106,17 +97,18 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
-      - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
-          channels: conda-forge
-          channel-priority: strict
-          show-channel-urls: true
-          miniforge-version: latest
+          python-version: '3.14'
+
+      - name: install conda-lock
+        shell: bash -leo pipefail {0}
+        run: |
+          pip install -r requirements.txt pytest
 
       - name: make the lock file
         shell: bash -leo pipefail {0}
         run: |
-          conda install --yes conda-lock "micromamba<2.8"
           cp test-env.yml test-env.yml.bak
           echo "  - numpy =2.2" >> test-env.yml
           conda-lock lock --no-mamba --micromamba --file test-env.yml
@@ -166,17 +158,18 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
-      - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
-          channels: conda-forge
-          channel-priority: strict
-          show-channel-urls: true
-          miniforge-version: latest
+          python-version: '3.14'
+
+      - name: install conda-lock
+        shell: bash -leo pipefail {0}
+        run: |
+          pip install -r requirements.txt pytest
 
       - name: make the lock file
         shell: bash -leo pipefail {0}
         run: |
-          conda install --yes conda-lock "micromamba<2.8"
           cp test-env.yml old-test-env.yml
           echo "  - python =3.11" >> old-test-env.yml
           conda-lock lock --no-mamba --micromamba --file old-test-env.yml
@@ -219,17 +212,18 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
-      - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
-          channels: conda-forge
-          channel-priority: strict
-          show-channel-urls: true
-          miniforge-version: latest
+          python-version: '3.14'
+
+      - name: install conda-lock
+        shell: bash -leo pipefail {0}
+        run: |
+          pip install -r requirements.txt pytest
 
       - name: make the lock file
         shell: bash -leo pipefail {0}
         run: |
-          conda install --yes conda-lock "micromamba<2.8"
           conda-lock lock --no-mamba --micromamba --file test-env.yml --lockfile conda-lockk.yml
 
       - name: relock

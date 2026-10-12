@@ -1,0 +1,5 @@
+click
+conda-lock>=4.0.3
+py-rattler==0.27.1
+pygithub
+ruamel.yaml
