@@ -70,6 +70,14 @@ inputs:
     description: 'whether to open the PR as a draft'
     required: true
     default: false
+  pr-title:
+    description: 'the title of the PR if one is being made'
+    required: false
+    default: 'relock w/ conda-lock'
+  commit-message:
+    description: 'the commit message if a commit is made'
+    required: false
+    default: 'relock w/ conda-lock'
   git-user-name:
     description: >
       the name to use for git commits; the default of '' attempts to infer the name
@@ -287,8 +295,8 @@ runs:
         && github.event_name != 'issue_comment'
       uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1
       with:
-        commit-message: relock w/ conda-lock
-        title: relock w/ conda-lock
+        commit-message: ${{ inputs.commit-message }}
+        title: ${{ inputs.pr-title }}
         body: "This pull request relocks the dependencies with conda-lock.
 
 
