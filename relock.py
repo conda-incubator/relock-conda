@@ -7,7 +7,7 @@ import tempfile
 from collections.abc import Mapping
 
 import click
-from conda.models.match_spec import MatchSpec
+from rattler.match_spec import MatchSpec
 from ruamel.yaml import YAML
 
 yaml = YAML(typ="safe", pure=True)
@@ -165,10 +165,10 @@ def main(
                     deps_to_relock = set()
                     for _spec in envyml["dependencies"]:
                         if not isinstance(_spec, Mapping):
-                            deps_to_relock.add(MatchSpec(_spec).name)
+                            deps_to_relock.add(MatchSpec(_spec).name.normalized)
                         else:
                             for _pkg in _spec:
-                                deps_to_relock.add(MatchSpec(_pkg).name)
+                                deps_to_relock.add(MatchSpec(_pkg).name.normalized)
 
                 if not update_packages:
                     print(

@@ -234,7 +234,8 @@ runs:
           click \
           'conda-lock>=4.0.3' \
           pygithub \
-          ruamel.yaml
+          ruamel.yaml \
+          py-rattler==0.27.1
 
     # - name: setup conda-lock
     #   if: ${{ steps.check.outputs.skip != 'true' }}
