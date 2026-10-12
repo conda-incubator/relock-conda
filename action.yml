@@ -233,7 +233,7 @@ runs:
         pip install \
           click \
           'conda-lock>=4.0.3' \
-          pygithub
+          pygithub \
           ruamel.yaml
 
     # - name: setup conda-lock
