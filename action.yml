@@ -230,30 +230,7 @@ runs:
       if: ${{ steps.check.outputs.skip != 'true' }}
       shell: bash -leo pipefail {0}
       run: |
-        pip install \
-          click \
-          'conda-lock>=4.0.3' \
-          pygithub \
-          ruamel.yaml \
-          py-rattler==0.27.1
-
-    # - name: setup conda-lock
-    #   if: ${{ steps.check.outputs.skip != 'true' }}
-    #   uses: mamba-org/setup-micromamba@f457c30a868e4760d3a6fcea5f25dc655b8edf39
-    #   with:
-    #     environment-name: relock-env
-    #     generate-run-shell: false
-    #     create-args: >-
-    #       click
-    #       conda
-    #       conda-lock>=3.0.4
-    #       pygithub
-    #       python
-    #       ruamel.yaml
-    #       micromamba<2.8
-    #     condarc: |
-    #       channels:
-    #         - conda-forge
+        pip install -r ${{ github.action_path }}/requirements.txt
 
     - name: relock
       id: relock

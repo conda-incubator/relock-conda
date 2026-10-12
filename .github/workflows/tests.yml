@@ -25,32 +25,7 @@ jobs:
       - name: install conda-lock
         shell: bash -leo pipefail {0}
         run: |
-          pip install \
-            click \
-            'conda-lock>=4.0.3' \
-            pygithub \
-            ruamel.yaml \
-            py-rattler==0.27.1 \
-            pytest
-
-      # - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb
-      #   with:
-      #     channels: conda-forge
-      #     channel-priority: strict
-      #     show-channel-urls: true
-      #     miniforge-version: latest
-
-      # - name: install deps
-      #   shell: bash -leo pipefail {0}
-      #   run: |
-      #     conda install --yes \
-      #       click \
-      #       ruamel.yaml \
-      #       "micromamba>=2.9.0" \
-      #       "conda-lock>=4.0.3" \
-      #       pygithub \
-      #       py-rattler==0.27.1 \
-      #       pytest \
+          pip install -r requirements.txt pytest
 
       - name: run tests
         shell: bash -leo pipefail {0}
