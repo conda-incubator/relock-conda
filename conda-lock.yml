@@ -13,7 +13,7 @@
 version: 1
 metadata:
   content_hash:
-    linux-64: cb94899980f1dd2ffd67368d348f0be980d5531536c27c4c4dac00f763b0006b
+    linux-64: 768e47230b18b6b04c7965334003baecd7b4fd9cf362e914f48c1fa946f52604
   channels:
   - url: conda-forge
     used_env_vars: []
@@ -95,6 +95,20 @@ package:
   hash:
     md5: 73a248c30811075059b5aeda766c2624
     sha256: f7d1bbdea61cf94ba219d17b2cb571a29830f8025385af799bff5a7ad1ef45e6
+  category: main
+  optional: false
+- name: libedit
+  version: 3.1.20260512
+  manager: conda
+  platform: linux-64
+  dependencies:
+    __glibc: '>=2.17,<3.0.a0'
+    libgcc: '>=14'
+    ncurses: '>=6.6,<7.0a0'
+  url: https://conda.anaconda.org/conda-forge/linux-64/libedit-3.1.20260512-pl5321h373387f_0.conda
+  hash:
+    md5: 27dbd7e2984b8fe48e069379636ccfdd
+    sha256: 45301f14f4eb66da57cfaf2d265f3eeee73f8b07e99614ee3afc5b26eea91126
   category: main
   optional: false
 - name: libexpat
@@ -226,20 +240,6 @@ package:
     sha256: 69a722751e14eab2eb3bfdcb9acb1187afbd962b0c49b48d829341e0f6787f60
   category: main
   optional: false
-- name: libpython
-  version: 3.13.16
-  manager: conda
-  platform: linux-64
-  dependencies:
-    __glibc: '>=2.17,<3.0.a0'
-    libgcc: '>=15'
-    libstdcxx: '>=15'
-  url: https://conda.anaconda.org/conda-forge/linux-64/libpython-3.13.16-hdc7f604_101_cp313.conda
-  hash:
-    md5: 6c9b3aaaa24997d37c5e193cfdca3938
-    sha256: 7a01347dfc0d99c6592010fc278500ab12fc852d902f35beca69608c5f1282d5
-  category: main
-  optional: false
 - name: libsqlite
   version: 3.54.0
   manager: conda
@@ -317,11 +317,11 @@ package:
     liblapack: '>=3.9.0,<4.0a0'
     libstdcxx: '>=15'
     python: ''
-    python_abi: 3.13.*
-  url: https://conda.anaconda.org/conda-forge/linux-64/numpy-2.5.4-py313hb5f73ae_0.conda
+    python_abi: 3.15.*
+  url: https://conda.anaconda.org/conda-forge/linux-64/numpy-2.5.4-py315h11958a5_0.conda
   hash:
-    md5: 1ddee4b1dc2f784b4137a43789be3816
-    sha256: e8ffae51383b57192b018bdeeb95c84ec617aa1428656825b1d4a326b81410dd
+    md5: 9826d4c893d56867548d8aa126f6e5ec
+    sha256: a3fb581f1a04a25a211f3a95c57dcde750587ee9c47a32055e857b752f4fab7d
   category: main
   optional: false
 - name: openssl
@@ -339,57 +339,43 @@ package:
   category: main
   optional: false
 - name: python
-  version: 3.13.16
+  version: 3.15.0
   manager: conda
   platform: linux-64
   dependencies:
     __glibc: '>=2.17,<3.0.a0'
     bzip2: '>=1.0.8,<2.0a0'
     ld_impl_linux-64: '>=2.36.1'
+    libedit: '>=3.1.20260512,<3.2.0a0'
     libexpat: '>=2.8.5,<3.0a0'
     libffi: '>=3.7.0,<3.8.0a0'
     libgcc: '>=15'
     liblzma: '>=5.8.3,<6.0a0'
     libmpdec: '>=4.0.0,<5.0a0'
-    libpython: 3.13.16
     libsqlite: '>=3.53.4,<4.0a0'
     libuuid: '>=2.42.4,<3.0a0'
     libzlib: '>=1.3.2,<2.0a0'
     ncurses: '>=6.6,<7.0a0'
     openssl: '>=3.5.9,<4.0a0'
-    python_abi: 3.13.*
-    readline: '>=8.3,<9.0a0'
+    python_abi: 3.15.*
     tk: '>=8.6.13,<8.7.0a0'
     tzdata: ''
-  url: https://conda.anaconda.org/conda-forge/linux-64/python-3.13.16-hf47f18c_101_cp313.conda
+    zstd: '>=1.5.7,<1.6.0a0'
+  url: https://conda.anaconda.org/conda-forge/linux-64/python-3.15.0-h6e52b48_100_cp315.conda
   hash:
-    md5: 85450b9eb16e2b58d2cae71600e6fbde
-    sha256: 914ce0022ee08951329ce85d8a35f55fa11e74239568bca6102375d630ca9e61
+    md5: 29cb4ef071444f9debb0efdce620e1d6
+    sha256: 66b6ac5dd5c64ce34a9c610cacdcc25fe43d7daf29611b6c48036a3c51771374
   category: main
   optional: false
 - name: python_abi
-  version: '3.13'
+  version: '3.15'
   manager: conda
   platform: linux-64
   dependencies: {}
-  url: https://conda.anaconda.org/conda-forge/noarch/python_abi-3.13-9_cp313.conda
+  url: https://conda.anaconda.org/conda-forge/noarch/python_abi-3.15-9_cp315.conda
   hash:
-    md5: c5abc97af551bc12d71305852392f75c
-    sha256: 9dc0cb6a20ebc7e9bcd8c6868f2bec083c114b0ba20b7118405c036533d5c522
-  category: main
-  optional: false
-- name: readline
-  version: '8.3'
-  manager: conda
-  platform: linux-64
-  dependencies:
-    __glibc: '>=2.17,<3.0.a0'
-    libgcc: '>=15'
-    ncurses: '>=6.6,<7.0a0'
-  url: https://conda.anaconda.org/conda-forge/linux-64/readline-8.3-hd6e31c0_1.conda
-  hash:
-    md5: 69c01c781e7c8190bbdaf79e3848c5ca
-    sha256: 01b3fe073a66e321970d09e04b388708f8cbdca5cdfbfcb7c9eeb470ad10383d
+    md5: b23461631fe2abdbade0cb64babe7344
+    sha256: 976c4a6db967a62385aa633daaab19a929f986b979a7ad836b8b70e15ca7aefd
   category: main
   optional: false
 - name: tk
