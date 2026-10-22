@@ -261,6 +261,8 @@ def main(
                     backup_lock_file, lock_file, shallow=False
                 ):
                     msg = "No package versions had updates, but the lock file had updated contents.\n"
+                    print(msg, flush=True, file=sys.stderr)
+                    print(msg, flush=True)
                     relocked = True
                 else:
                     print("No packages have been updated.", flush=True, file=sys.stderr)
