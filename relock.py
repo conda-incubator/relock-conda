@@ -1,3 +1,4 @@
+import filecmp
 import os
 import pprint
 import shutil
@@ -255,6 +256,9 @@ def main(
                     print(msg, flush=True, file=sys.stderr)
                     print(msg, flush=True)
 
+                    relocked = True
+                elif relock_all_packages and not filecmp.cmp(backup_lock_file, lock_file, shallow=False):
+                    msg = "No package versions had updates, but the lock file had updated contents.\n"
                     relocked = True
                 else:
                     print("No packages have been updated.", flush=True, file=sys.stderr)
