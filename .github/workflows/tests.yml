@@ -69,10 +69,12 @@ jobs:
       - name: check the summary
         if: steps.relock.outputs.relocked == 'true'
         run: |
-          echo '${{ steps.relock.outputs.summary }}'
-          if [[ "${{ steps.relock.outputs.summary }}" == "" ]]; then
+          echo "${RELOCK_SUMMARY}"
+          if [[ "${RELOCK_SUMMARY}" == "" ]]; then
             exit 1
           fi
+        env:
+          RELOCK_SUMMARY: ${{ steps.relock.outputs.summary }}
 
       - name: test that PR is OK
         if: steps.relock.outputs.relocked == 'true'
@@ -149,10 +151,12 @@ jobs:
       - name: check the summary
         if: steps.relock.outputs.relocked == 'true'
         run: |
-          echo '${{ steps.relock.outputs.summary }}'
-          if [[ "${{ steps.relock.outputs.summary }}" == "" ]]; then
+          echo "${RELOCK_SUMMARY}"
+          if [[ "${RELOCK_SUMMARY}" == "" ]]; then
             exit 1
           fi
+        env:
+          RELOCK_SUMMARY: ${{ steps.relock.outputs.summary }}
 
       - name: test that lock file is different
         if: steps.relock.outputs.relocked == 'true'
