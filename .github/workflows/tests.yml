@@ -367,9 +367,10 @@ jobs:
         if: always()
         continue-on-error: true
         shell: bash
-        run: gh pr close ${{ needs.tests-skip-existing-part-1.outputs.pull-request-number }}
+        run: gh pr close "${PR_NUMBER}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ needs.tests-skip-existing-part-1.outputs.pull-request-number }}
 
   tests-ignore:
     name: test ignore
