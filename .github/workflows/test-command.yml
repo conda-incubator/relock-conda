@@ -10,10 +10,7 @@ concurrency:
   group: test-command
   cancel-in-progress: false
 
-permissions:
-  actions: write
-  contents: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   test-command:
@@ -24,6 +21,10 @@ jobs:
       max-parallel: 1
       matrix:
         force: ["--force", ""]
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
