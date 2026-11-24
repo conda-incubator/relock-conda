@@ -194,7 +194,7 @@ runs:
             login=''
           fi
           if [[ "${login}" == "" || "${login}" == "null" ]]; then
-            login='${{ github.actor }}'
+            login="${GH_ACTOR}"
           fi
 
           user_id=$(gh api user --jq '.id' || echo '')
@@ -202,7 +202,7 @@ runs:
             user_id=''
           fi
           if [[ "${user_id}" == "" || "${user_id}" == "null" ]]; then
-            user_id='${{ github.actor_id }}'
+            user_id="${GH_ACTOR_ID}"
           fi
           user_id="${user_id}+"
         else
@@ -231,6 +231,8 @@ runs:
         GH_TOKEN: ${{ inputs.github-token }}
         INPUT_GIT_USER_NAME: ${{ inputs.git-user-name }}
         INPUT_GIT_USER_EMAIL: ${{ inputs.git-user-email }}
+        GH_ACTOR: ${{ github.actor }}
+        GH_ACTOR_ID: ${{ github.actor_id }}
 
     - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
       if: ${{ steps.check.outputs.skip != 'true' }}
