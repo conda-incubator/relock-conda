@@ -10,6 +10,8 @@ concurrency:
   group: tests
   cancel-in-progress: false
 
+permissions: {}
+
 jobs:
   tests:
     name: test code
@@ -36,12 +38,15 @@ jobs:
     name: test locks
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: conda-lock.yml
@@ -94,6 +99,8 @@ jobs:
     name: test update package
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
@@ -121,7 +128,7 @@ jobs:
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: conda-lock.yml
@@ -155,6 +162,8 @@ jobs:
     name: test updates w/ file
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
@@ -181,7 +190,7 @@ jobs:
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: conda-lock.yml
@@ -209,6 +218,9 @@ jobs:
     name: test no update
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
@@ -228,7 +240,7 @@ jobs:
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: conda-lockk.yml
@@ -258,12 +270,15 @@ jobs:
       pull-request-number: ${{ steps.relock.outputs.pull-request-number }}
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: conda-lock.yml
@@ -301,12 +316,15 @@ jobs:
     needs: tests-skip-existing-part-1
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: conda-lock.yml
@@ -335,12 +353,15 @@ jobs:
     name: test ignore
     runs-on: "ubuntu-latest"
     if: github.event.pull_request.title != 'relock w/ conda-lock'
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: outdated-conda-lock.yml
