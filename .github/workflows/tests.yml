@@ -41,7 +41,7 @@ jobs:
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: conda-lock.yml
@@ -121,7 +121,7 @@ jobs:
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: conda-lock.yml
@@ -181,7 +181,7 @@ jobs:
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: conda-lock.yml
@@ -228,7 +228,7 @@ jobs:
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: conda-lockk.yml
@@ -263,7 +263,7 @@ jobs:
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: conda-lock.yml
@@ -306,7 +306,7 @@ jobs:
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: conda-lock.yml
@@ -340,7 +340,7 @@ jobs:
 
       - name: relock
         id: relock
-        uses: ./
+        uses: $/.
         with:
           environment-file: test-env.yml
           lock-file: outdated-conda-lock.yml
