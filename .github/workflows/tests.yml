@@ -19,6 +19,8 @@ jobs:
     if: github.event.pull_request.title != 'relock w/ conda-lock'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
         with:
@@ -43,6 +45,8 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
 
       - name: relock
         id: relock
@@ -65,10 +69,12 @@ jobs:
       - name: check the summary
         if: steps.relock.outputs.relocked == 'true'
         run: |
-          echo '${{ steps.relock.outputs.summary }}'
-          if [[ "${{ steps.relock.outputs.summary }}" == "" ]]; then
+          echo "${RELOCK_SUMMARY}"
+          if [[ "${RELOCK_SUMMARY}" == "" ]]; then
             exit 1
           fi
+        env:
+          RELOCK_SUMMARY: ${{ steps.relock.outputs.summary }}
 
       - name: test that PR is OK
         if: steps.relock.outputs.relocked == 'true'
@@ -103,6 +109,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
         with:
@@ -143,10 +151,12 @@ jobs:
       - name: check the summary
         if: steps.relock.outputs.relocked == 'true'
         run: |
-          echo '${{ steps.relock.outputs.summary }}'
-          if [[ "${{ steps.relock.outputs.summary }}" == "" ]]; then
+          echo "${RELOCK_SUMMARY}"
+          if [[ "${RELOCK_SUMMARY}" == "" ]]; then
             exit 1
           fi
+        env:
+          RELOCK_SUMMARY: ${{ steps.relock.outputs.summary }}
 
       - name: test that lock file is different
         if: steps.relock.outputs.relocked == 'true'
@@ -166,6 +176,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
         with:
@@ -223,6 +235,8 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
         with:
@@ -275,6 +289,8 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
 
       - name: relock
         id: relock
@@ -321,6 +337,8 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
 
       - name: relock
         id: relock
@@ -358,6 +376,8 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
 
       - name: relock
         id: relock

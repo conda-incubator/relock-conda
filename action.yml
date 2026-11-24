@@ -194,7 +194,7 @@ runs:
             login=''
           fi
           if [[ "${login}" == "" || "${login}" == "null" ]]; then
-            login='${{ github.actor }}'
+            login="${GH_ACTOR}"
           fi
 
           user_id=$(gh api user --jq '.id' || echo '')
@@ -202,7 +202,7 @@ runs:
             user_id=''
           fi
           if [[ "${user_id}" == "" || "${user_id}" == "null" ]]; then
-            user_id='${{ github.actor_id }}'
+            user_id="${GH_ACTOR_ID}"
           fi
           user_id="${user_id}+"
         else
@@ -231,6 +231,8 @@ runs:
         GH_TOKEN: ${{ inputs.github-token }}
         INPUT_GIT_USER_NAME: ${{ inputs.git-user-name }}
         INPUT_GIT_USER_EMAIL: ${{ inputs.git-user-email }}
+        GH_ACTOR: ${{ github.actor }}
+        GH_ACTOR_ID: ${{ github.actor_id }}
 
     - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
       if: ${{ steps.check.outputs.skip != 'true' }}
@@ -290,11 +292,13 @@ runs:
         python ${{ github.action_path }}/commit_lockfile.py \
           --lock-file='${INPUT_LOCKFILE}' \
           --event-name='${{ github.event_name }}' \
-          --git-user-name='${{ steps.git-user.outputs.user-name }}' \
-          --git-user-email='${{ steps.git-user.outputs.user-email }}'
+          --git-user-name="${GH_USER_NAME}" \
+          --git-user-email="${GH_USER_EMAIL}"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
         INPUT_LOCKFILE: ${{ inputs.lock-file }}
+        GH_USER_NAME: ${{ steps.git-user.outputs.user-name }}
+        GH_USER_EMAIL: ${{ steps.git-user.outputs.user-email }}
 
     - name: open PR
       id: pr
@@ -382,7 +386,7 @@ runs:
         res=""
 
         # if we skipped, we did not relock
-        if [[ "${res}" == "" && '${{ steps.check.outputs.skip }}' == 'true' ]]; then
+        if [[ "${res}" == "" && "${SKIP}" == 'true' ]]; then
           res="false"
         fi
 
@@ -390,7 +394,7 @@ runs:
         if [[ "${res}" == "" && '${{ steps.relock.outputs.env_relocked }}' == 'true' ]]; then
           # for a PR, we need to know if it was opened
           if [[ '${INPUTS_ACTION}' == 'pr' ]]; then
-            if [[ '${{ steps.pr.outputs.pull-request-number }}' != '' ]]; then
+            if [[ "${PR_NUMBER}" != '' ]]; then
               res="true"
             else
               res="false"
@@ -409,6 +413,8 @@ runs:
         echo "relocked=${res}" >> "$GITHUB_OUTPUT"
       env:
         INPUTS_ACTION: ${{ inputs.action }}
+        SKIP: ${{ steps.check.outputs.skip }}
+        PR_NUMBER: ${{ steps.pr.outputs.pull-request-number }}
 
     - name: if on issue, set final commit status
       if: >-
@@ -421,7 +427,7 @@ runs:
         # set commit status
         if [[ '${{ steps.relock.outcome }}' == 'success' ]]; then
           state='success'
-          if [[ '${{ steps.relock.outputs.env_relocked }}' == 'true' ]]; then
+          if [[ "${ENV_RELOCKED}" == 'true' ]]; then
             msg="Relocked the conda environment successfully."
           else
             msg="The conda environment was already up-to-date."
@@ -431,7 +437,7 @@ runs:
           msg="Relocking the conda environment failed."
         fi
 
-        sha=${{ steps.issue_reaction.outputs.sha }}
+        sha="${REACTION_SHA}"
         url='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
 
         gh api \
@@ -445,3 +451,5 @@ runs:
           -f "context=relock-conda"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
+        REACTION_SHA: ${{ steps.issue_reaction.outputs.sha }}
+        ENV_RELOCKED: ${{ steps.relock.outputs.env_relocked }}
