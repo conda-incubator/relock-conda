@@ -125,11 +125,11 @@ runs:
           else
             prs=$(gh pr list \
                 --repo "$GITHUB_REPOSITORY" \
-                --head '${INPUT_HEAD_BRANCH}' \
+                --head "${INPUT_HEAD_BRANCH}" \
                 --json title \
                 --jq 'map(select(.title == "relock w/ conda-lock")) | length')
 
-            if [[ ${prs} !=  "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
+            if [[ ${prs} != "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
                 res="true"
             else
                 res="false"
@@ -358,9 +358,10 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         # automerge
-        gh pr merge --merge --auto '${{ steps.pr.outputs.pull-request-number }}'
+        gh pr merge --merge --auto "${PR_NUMBER}"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
+        PR_NUMBER: ${{ steps.pr.outputs.pull-request-number }}
 
     - name: merge as admin
       if: >-
@@ -373,9 +374,10 @@ runs:
       shell: bash -leo pipefail {0}
       run: |
         # merge as admin
-        gh pr merge --merge --admin '${{ steps.pr.outputs.pull-request-number }}'
+        gh pr merge --merge --admin "${PR_NUMBER}"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
+        PR_NUMBER: ${{ steps.pr.outputs.pull-request-number }}
 
     - name: set outputs
       id: set-output
@@ -391,7 +393,7 @@ runs:
         fi
 
         # if the env was relocked, then we look at PR vs file
-        if [[ "${res}" == "" && '${{ steps.relock.outputs.env_relocked }}' == 'true' ]]; then
+        if [[ "${res}" == "" && "${ENV_RELOCKED}" == 'true' ]]; then
           # for a PR, we need to know if it was opened
           if [[ '${INPUTS_ACTION}' == 'pr' ]]; then
             if [[ "${PR_NUMBER}" != '' ]]; then
@@ -415,6 +417,7 @@ runs:
         INPUTS_ACTION: ${{ inputs.action }}
         SKIP: ${{ steps.check.outputs.skip }}
         PR_NUMBER: ${{ steps.pr.outputs.pull-request-number }}
+        ENV_RELOCKED: ${{ steps.relock.outputs.env_relocked }}
 
     - name: if on issue, set final commit status
       if: >-
