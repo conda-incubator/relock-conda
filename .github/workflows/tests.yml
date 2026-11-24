@@ -80,7 +80,7 @@ jobs:
         if: steps.relock.outputs.relocked == 'true'
         shell: bash
         run: |
-          gh pr checkout ${{ steps.relock.outputs.pull-request-number }}
+          gh pr checkout "${PR_NUMBER}"
           ls -lah
           if [ -f conda-lock.yml ]; then
             :  # do nothing
@@ -92,14 +92,16 @@ jobs:
           grep python conda-lock.yml
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.relock.outputs.pull-request-number }}
 
       - name: close PR
         if: always()
         continue-on-error: true
         shell: bash
-        run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
+        run: gh pr close "${PR_NUMBER}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.relock.outputs.pull-request-number }}
 
   tests-update-package:
     name: test update package
@@ -274,9 +276,10 @@ jobs:
         if: always()
         continue-on-error: true
         shell: bash
-        run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
+        run: gh pr close "${PR_NUMBER}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.relock.outputs.pull-request-number }}
 
   tests-skip-existing-part-1:
     name: test skip existing part 1
@@ -314,7 +317,7 @@ jobs:
         if: steps.relock.outputs.relocked == 'true'
         shell: bash
         run: |
-          gh pr checkout ${{ steps.relock.outputs.pull-request-number }}
+          gh pr checkout "${PR_NUMBER}"
           ls -lah
           if [ -f conda-lock.yml ]; then
             :  # do nothing
@@ -326,6 +329,7 @@ jobs:
           grep python conda-lock.yml
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.relock.outputs.pull-request-number }}
 
   tests-skip-existing-part-2:
     name: test skip existing part 2
@@ -403,6 +407,7 @@ jobs:
         if: always()
         continue-on-error: true
         shell: bash
-        run: gh pr close ${{ steps.relock.outputs.pull-request-number }}
+        run: gh pr close "${PR_NUMBER}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.relock.outputs.pull-request-number }}
