@@ -125,11 +125,11 @@ runs:
           else
             prs=$(gh pr list \
                 --repo "$GITHUB_REPOSITORY" \
-                --head '${INPUT_HEAD_BRANCH}' \
+                --head "${INPUT_HEAD_BRANCH}" \
                 --json title \
                 --jq 'map(select(.title == "relock w/ conda-lock")) | length')
 
-            if [[ ${prs} !=  "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
+            if [[ ${prs} != "0" && ${SKIP_IF_PR_EXISTS} == "true" ]]; then
                 res="true"
             else
                 res="false"
