@@ -125,7 +125,7 @@ runs:
           else
             prs=$(gh pr list \
                 --repo "$GITHUB_REPOSITORY" \
-                --head '${{ inputs.head-branch }}' \
+                --head '${INPUT_HEAD_BRANCH}' \
                 --json title \
                 --jq 'map(select(.title == "relock w/ conda-lock")) | length')
 
@@ -144,6 +144,7 @@ runs:
         EVENT_NAME: ${{ github.event_name }}
         HAS_RELOCK_SLUG: ${{ startsWith(github.event.comment.body, '/relock-conda') }}
         COMMENT_IS_PR: ${{ github.event.issue.pull_request != null }}
+        INPUT_HEAD_BRANCH: ${{ inputs.head-branch }}
 
     - name: if on issue, get PR, react to comment, and set commit status
       id: issue_reaction
@@ -187,7 +188,7 @@ runs:
       if: ${{ steps.check.outputs.skip != 'true' }}
       shell: bash -leo pipefail {0}
       run: |
-        if [[ '${{ inputs.git-user-name }}' == '' ]]; then
+        if [[ '${INPUT_GIT_USER_NAME}' == '' ]]; then
           login=$(gh api user --jq '.login' || echo '')
           if [[ "${login}" == *"status\":\"4"* ]]; then
             login=''
@@ -205,11 +206,11 @@ runs:
           fi
           user_id="${user_id}+"
         else
-          login='${{ inputs.git-user-name }}'
+          login='${INPUT_GIT_USER_NAME}'
           user_id=''
         fi
 
-        if [[ '${{ inputs.git-user-email }}' == '' ]]; then
+        if [[ '${INPUT_GIT_USER_EMAIL}' == '' ]]; then
           email=$(gh api user --jq '.email' || echo '')
           if [[ "${email}" == *"status\":\"4"* ]]; then
             email=''
@@ -218,7 +219,7 @@ runs:
             email=${user_id}${login}@users.noreply.github.com
           fi
         else
-          email='${{ inputs.git-user-email }}'
+          email='${INPUT_GIT_USER_EMAIL}'
         fi
 
         echo "login: ${login}"
@@ -228,6 +229,8 @@ runs:
         echo "user-email=${email}" >> "$GITHUB_OUTPUT"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
+        INPUT_GIT_USER_NAME: ${{ inputs.git-user-name }}
+        INPUT_GIT_USER_EMAIL: ${{ inputs.git-user-email }}
 
     - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
       if: ${{ steps.check.outputs.skip != 'true' }}
@@ -247,13 +250,13 @@ runs:
       run: |
         # relock
         python ${{ github.action_path }}/relock.py \
-          --environment-file='${{ inputs.environment-file }}' \
-          --lock-file='${{ inputs.lock-file }}' \
-          --update-packages='${{ inputs.update-packages }}' \
-          --ignored-packages='${{ inputs.ignored-packages }}' \
+          --environment-file="${INPUT_ENVIRONMENT_FILE}" \
+          --lock-file="${INPUT_LOCKFILE}" \
+          --update-packages="${INPUT_UPDATE_PACKAGES}" \
+          --ignored-packages="${INPUT_IGNORED_PACKAGES}" \
           --relock-all-packages="${FINAL_RELOCK_ALL_PACKAGES}" \
-          --include-only-packages='${{ inputs.include-only-packages }}' \
-          --merge-as-admin-packages='${{ inputs.merge-as-admin-packages }}' \
+          --include-only-packages="${INPUT_INCLUDE_ONLY_PACKAGES}" \
+          --merge-as-admin-packages="${INPUT_MERGE_AS_ADMIN_PACKAGES}" \
           > ${{ github.action_path }}/summary.txt
         {
           echo 'summary<<EOF'
@@ -263,6 +266,12 @@ runs:
         rm ${{ github.action_path }}/summary.txt
       env:
         FINAL_RELOCK_ALL_PACKAGES: ${{ (inputs.relock-all-packages == 'true') || (startsWith(github.event.comment.body, '/relock-conda') && contains(github.event.comment.body, '--force')) }}
+        INPUT_ENVIRONMENT_FILE: ${{ inputs.environment-file }}
+        INPUT_LOCKFILE: ${{ inputs.lock-file }}
+        INPUT_UPDATE_PACKAGES: ${{ inputs.update-packages }}
+        INPUT_IGNORED_PACKAGES: ${{ inputs.ignored-packages }}
+        INPUT_INCLUDE_ONLY_PACKAGES: ${{ inputs.include-only-packages }}
+        INPUT_MERGE_AS_ADMIN_PACKAGES: ${{ inputs.merge-as-admin-packages }}
 
     - name: commit changes
       if: >-
@@ -279,12 +288,13 @@ runs:
       run: |
         # commit changes
         python ${{ github.action_path }}/commit_lockfile.py \
-          --lock-file='${{ inputs.lock-file }}' \
+          --lock-file='${INPUT_LOCKFILE}' \
           --event-name='${{ github.event_name }}' \
           --git-user-name='${{ steps.git-user.outputs.user-name }}' \
           --git-user-email='${{ steps.git-user.outputs.user-email }}'
       env:
         GH_TOKEN: ${{ inputs.github-token }}
+        INPUT_LOCKFILE: ${{ inputs.lock-file }}
 
     - name: open PR
       id: pr
@@ -379,7 +389,7 @@ runs:
         # if the env was relocked, then we look at PR vs file
         if [[ "${res}" == "" && '${{ steps.relock.outputs.env_relocked }}' == 'true' ]]; then
           # for a PR, we need to know if it was opened
-          if [[ '${{ inputs.action }}' == 'pr' ]]; then
+          if [[ '${INPUTS_ACTION}' == 'pr' ]]; then
             if [[ '${{ steps.pr.outputs.pull-request-number }}' != '' ]]; then
               res="true"
             else
@@ -397,6 +407,8 @@ runs:
         fi
 
         echo "relocked=${res}" >> "$GITHUB_OUTPUT"
+      env:
+        INPUTS_ACTION: ${{ inputs.action }}
 
     - name: if on issue, set final commit status
       if: >-
